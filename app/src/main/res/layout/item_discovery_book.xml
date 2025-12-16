@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardBook"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/input_border_red"
+    android:padding="16dp"
+    android:layout_marginBottom="16dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <View
+        android:id="@+id/imgBookCover"
+        android:layout_width="70dp"
+        android:layout_height="100dp"
+        android:background="#EEEEEE"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toEndOf="@id/imgBookCover"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnViewProfile"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tvBookNeeded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Needs: Loading..."
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/tvStudentName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Student: Ali K."
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/tvStudentLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location: Muğla"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/btnViewProfile"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_send"
+        android:rotation="270"
+        app:tint="#FF6B6B"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

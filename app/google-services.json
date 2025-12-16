@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "821052845978",
+    "project_id": "readshare-c95f3",
+    "storage_bucket": "readshare-c95f3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:821052845978:android:b00862f54556b570bdd423",
+        "android_client_info": {
+          "package_name": "msku.ceng.madlab.readshare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeg1YCpCef_HZ3mgUfMOxcF9aX7OmRoy4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

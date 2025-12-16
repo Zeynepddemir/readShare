@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".StudentDetailActivity">
+
+    <View
+        android:id="@+id/viewHeader"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:background="#FF6B6B"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@android:drawable/ic_menu_revert"
+        app:tint="#FFFFFF"
+        android:rotation="180"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardProfile"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:cardCornerRadius="50dp"
+        app:cardElevation="8dp"
+        app:layout_constraintTop_toBottomOf="@id/viewHeader"
+        app:layout_constraintBottom_toBottomOf="@id/viewHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@android:drawable/sym_def_app_icon"
+            android:scaleType="centerCrop"/>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvDetailName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Student Name"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/cardProfile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvDetailSchool"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="School Name"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tvDetailName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/layoutProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_input_bg"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvDetailSchool">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monthly Reading Goal"
+            android:textStyle="bold"
+            android:textColor="#333333"/>
+
+        <ProgressBar
+            android:id="@+id/progressBarReading"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:max="10"
+            android:progress="0"
+            android:progressTint="#FF6B6B"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/tvProgressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0 / 10 Books Read"
+            android:gravity="end"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/headerBadges"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/layoutProgress">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Earned Badges"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:id="@+id/btnViewAllBadges"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="What are these? >"
+            android:textColor="#FF6B6B"
+            android:textStyle="bold"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/scrollBadges"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingStart="24dp"
+        android:paddingBottom="4dp"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/headerBadges">
+
+        <LinearLayout
+            android:id="@+id/layoutEarnedBadgesContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"/>
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/tvDiaryTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reading Diary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollBadges"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvDiaryTitle"
+        app:layout_constraintBottom_toTopOf="@id/btnAddBook">
+
+        <LinearLayout
+            android:id="@+id/layoutBookListContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="20dp"/>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnAddBook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="+ Add New Book"
+        android:backgroundTint="#FF6B6B"
+        android:textColor="#FFFFFF"
+        android:layout_margin="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

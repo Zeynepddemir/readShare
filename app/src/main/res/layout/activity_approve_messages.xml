@@ -1,215 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F9F9F9"
-    tools:context=".ApproveMessagesActivity">
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@android:drawable/ic_menu_revert"
-        app:tint="#000000"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:rotation="180"/>
-
-    <TextView
-        android:id="@+id/tvPageTitle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Approve Messages"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        app:layout_constraintTop_toTopOf="@id/btnBack"
-        app:layout_constraintBottom_toBottomOf="@id/btnBack"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
 
-    <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Review Student Thank-You messages before they are sent to donors"
-        android:textSize="14sp"
-        android:textColor="#666666"
-        android:gravity="center"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/tvPageTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@android:drawable/ic_menu_revert"
+            android:rotation="180"
+            android:tint="#000000"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Message Requests"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginTop="16dp"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="20dp">
+        android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/layoutMessagesContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:id="@+id/cardMessage1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/input_border_red"
-                android:padding="16dp"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:text="Student Name: Ayşe Yılmaz"
-                    android:textStyle="bold"
-                    android:textColor="#000000"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Class: 4"
-                    android:textColor="#333333"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Book Title: Animal Stories"
-                    android:textColor="#333333"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text='Message Preview: "Thank you for sending me these books! I love reading animal stories."'
-                    android:textStyle="italic"
-                    android:textColor="#555555"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Date Submitted: Nov 9, 2025"
-                    android:textSize="12sp"
-                    android:textColor="#999999"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="12dp">
-
-                    <Button
-                        android:id="@+id/btnApprove1"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:text="Approve ✅"
-                        android:textSize="12sp"
-                        android:backgroundTint="#4CAF50"
-                        android:textColor="#FFFFFF"
-                        android:layout_marginEnd="8dp"/>
-
-                    <Button
-                        android:id="@+id/btnReject1"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:text="Request Edit ❌"
-                        android:textSize="12sp"
-                        android:backgroundTint="#F44336"
-                        android:textColor="#FFFFFF"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/cardMessage2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/input_border_red"
-                android:padding="16dp"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:text="Student Name: Mehmet Demir"
-                    android:textStyle="bold"
-                    android:textColor="#000000"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Class: 4"
-                    android:textColor="#333333"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Book Title: Space Adventure"
-                    android:textColor="#333333"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text='Message Preview: "I learned so much about planets. Thanks!"'
-                    android:textStyle="italic"
-                    android:textColor="#555555"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Date Submitted: Nov 10, 2025"
-                    android:textSize="12sp"
-                    android:textColor="#999999"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="12dp">
-
-                    <Button
-                        android:id="@+id/btnApprove2"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:text="Approve ✅"
-                        android:textSize="12sp"
-                        android:backgroundTint="#4CAF50"
-                        android:textColor="#FFFFFF"
-                        android:layout_marginEnd="8dp"/>
-
-                    <Button
-                        android:id="@+id/btnReject2"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:text="Request Edit ❌"
-                        android:textSize="12sp"
-                        android:backgroundTint="#F44336"
-                        android:textColor="#FFFFFF"/>
-                </LinearLayout>
-            </LinearLayout>
-
-        </LinearLayout>
+            android:orientation="vertical"/>
     </ScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

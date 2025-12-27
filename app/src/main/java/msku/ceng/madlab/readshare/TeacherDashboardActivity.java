@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,11 +22,18 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityTeacherDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         db = FirebaseFirestore.getInstance();
 
+        // 1. Öğrencileri Listele
         fetchMyStudents();
 
-        // Butonlar
+        // 2. İstatistikleri ve Bildirimleri Güncelle (CANLI VERİ)
+        fetchDashboardStats();
+
+        // --- BUTON İŞLEMLERİ ---
+
+        // Yeni Öğrenci Kaydetme
         binding.btnRegisterNew.setOnClickListener(v -> {
             StudentRegisterFragment fragment = new StudentRegisterFragment();
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -36,40 +42,58 @@ public class TeacherDashboardActivity extends AppCompatActivity {
             transaction.commit();
         });
 
+        // Çıkış Yap
         binding.tvLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(TeacherDashboardActivity.this, MainActivity.class));
             finish();
         });
 
-        // Mesaj Onay Ekranı (Bildirime Tıklayınca)
-        binding.tvNotifMessage.setOnClickListener(v -> {
-            startActivity(new Intent(TeacherDashboardActivity.this, MessageApprovalActivity.class));
+        // Mesaj Kutusu (Sağ Üst)
+        binding.btnMessages.setOnClickListener(v -> {
+            startActivity(new Intent(TeacherDashboardActivity.this, ApproveMessagesActivity.class));
         });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // Sayfaya geri dönüldüğünde verileri yenile
         fetchMyStudents();
+        fetchDashboardStats();
+    }
+
+    // --- BİLDİRİM SAYILARINI GÜNCELLEYEN FONKSİYON ---
+    private void fetchDashboardStats() {
+        // Bekleyen (Pending) mesaj sayısını bul
+        db.collection("messages")
+                .whereEqualTo("status", "Pending")
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    int pendingCount = snapshots.size();
+
+                    // XML'deki tvNotifMessage alanına yaz
+                    // "0 Thank-you messages waiting" yazısını güncelliyoruz
+                    if (binding.tvNotifMessage != null) {
+                        binding.tvNotifMessage.setText(pendingCount + " Thank-you messages waiting");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Hata olursa (örneğin internet yoksa) 0 varsayalım veya loglayalım
+                });
     }
 
     private void fetchMyStudents() {
         binding.layoutStudentCardsContainer.removeAllViews();
-        db.collection("students").get().addOnSuccessListener(snapshots -> {
 
-            // İstatistikler (Basit Hesaplama)
+        db.collection("students").get().addOnSuccessListener(snapshots -> {
             int total = snapshots.size();
             binding.tvTotalStudents.setText("Total Students: " + total);
-            binding.tvTotalDonated.setText("Books Donated: " + (total * 3));
-            binding.tvTotalMessages.setText("Messages Approved: " + (total * 2));
-            if(total > 0) binding.tvNotifDiary.setText("📖 " + total + " Students active");
 
-            // Kartları Ekle
             for (DocumentSnapshot snap : snapshots) {
                 Student s = snap.toObject(Student.class);
                 if (s != null) {
-                    s.setStudentId(snap.getId()); // ID'yi kaydet
+                    s.setStudentId(snap.getId());
                     addStudentCard(s);
                 }
             }
@@ -83,17 +107,16 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         TextView grade = card.findViewById(R.id.tvCardGrade);
         TextView school = card.findViewById(R.id.tvCardSchool);
 
-        name.setText(student.getName());
-        grade.setText(student.getAge());
-        school.setText(student.getSchool());
+        name.setText(student.getName() != null ? student.getName() : "No Name");
+        grade.setText(student.getAge() != null ? student.getAge() : "-");
+        school.setText(student.getSchool() != null ? student.getSchool() : "-");
 
-        // DETAY SAYFASINA GİT (ID ve İsim ile)
+        // Karta tıklayınca profile git
         card.setOnClickListener(v -> {
             Intent intent = new Intent(TeacherDashboardActivity.this, StudentDetailActivity.class);
             intent.putExtra("name", student.getName());
             intent.putExtra("school", student.getSchool());
-            // ÖNEMLİ: ID'yi gönderiyoruz (Eğer null ise ismi kullanır Detail tarafı)
-            intent.putExtra("studentId", student.getStudentId() != null ? student.getStudentId() : student.getName());
+            intent.putExtra("studentId", student.getStudentId());
             startActivity(intent);
         });
 

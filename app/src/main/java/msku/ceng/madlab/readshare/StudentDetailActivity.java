@@ -33,11 +33,11 @@ public class StudentDetailActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // 1. DASHBOARD'DAN GELEN VERİLER
+        // 1. DASHBOARD'DAN GELEN VERİLERİ AL
         String name = getIntent().getStringExtra("name");
         String school = getIntent().getStringExtra("school");
 
-        // ID kontrolü (Dashboard'dan gelen ID veya İsim)
+        // ID kontrolü
         String idFromIntent = getIntent().getStringExtra("studentId");
         studentId = (idFromIntent != null) ? idFromIntent : name;
 
@@ -45,15 +45,22 @@ public class StudentDetailActivity extends AppCompatActivity {
         binding.tvDetailName.setText(name != null ? name : "Student");
         binding.tvDetailSchool.setText(school != null ? school : "School");
 
-        // 2. LİSTEYİ GETİR
+        // 2. KİTAPLARI GETİR
         fetchReadingDiary();
 
         // 3. BUTONLAR
         binding.btnBack.setOnClickListener(v -> finish());
         binding.btnAddBook.setOnClickListener(v -> showAddBookDialog());
 
-        // "What are these?" Linki -> Katalog Sayfasına Gider
+        // --- İŞTE DÜZELTİLEN KISIM BURASI ---
+        // "What are these?" yazısına tıklayınca BadgeActivity (Katalog) açılmalı
         binding.btnViewAllBadges.setOnClickListener(v -> {
+            Intent intent = new Intent(StudentDetailActivity.this, BadgeActivity.class); // Hedef: BadgeActivity
+            startActivity(intent);
+        });
+
+        // Profil resmine tıklayınca da açılmasını istersen:
+        binding.cardProfile.setOnClickListener(v -> {
             startActivity(new Intent(StudentDetailActivity.this, BadgeActivity.class));
         });
     }
@@ -71,7 +78,7 @@ public class StudentDetailActivity extends AppCompatActivity {
                     binding.progressBarReading.setProgress(totalBooks);
                     binding.tvProgressText.setText(totalBooks + " / 10 Books Read");
 
-                    // *** KAZANILAN ROZETLERİ GÖSTER ***
+                    // Rozetleri Hesapla ve Göster
                     updateEarnedBadgesArea(totalBooks);
 
                     if (!queryDocumentSnapshots.isEmpty()) {
@@ -79,7 +86,7 @@ public class StudentDetailActivity extends AppCompatActivity {
                             addBookRow(snapshot.getString("title"), snapshot.getString("pages"), snapshot.getString("status"));
                         }
                     } else {
-                        Toast.makeText(this, "No books yet. Add one!", Toast.LENGTH_SHORT).show();
+                        // Kitap yoksa uyarı verme, sessizce bekle
                     }
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -97,13 +104,16 @@ public class StudentDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // Kural: 1+ Kitap
+        // Kural: 1+ Kitap -> Book Beginner
         if (bookCount >= 1) addBadgeIcon(android.R.drawable.btn_star_big_on, "#FFC107", "Beginner");
-        // Kural: 5+ Kitap
+
+        // Kural: 5+ Kitap -> Streak
         if (bookCount >= 5) addBadgeIcon(android.R.drawable.ic_menu_my_calendar, "#4CAF50", "Streak");
-        // Kural: 10+ Kitap
+
+        // Kural: 10+ Kitap -> Super Reader
         if (bookCount >= 10) addBadgeIcon(android.R.drawable.btn_star_big_on, "#FF9800", "Super Reader");
-        // Kural: 20+ Kitap
+
+        // Kural: 20+ Kitap -> Master
         if (bookCount >= 20) addBadgeIcon(android.R.drawable.ic_menu_compass, "#9C27B0", "Master");
     }
 
@@ -131,28 +141,21 @@ public class StudentDetailActivity extends AppCompatActivity {
 
     // --- KİTAP SATIRI EKLEME ---
     private void addBookRow(String title, String pages, String status) {
+        // Eğer layout dosyan item_library_book ise onu kullan
+        // Yoksa basit bir TextView ekleyebilirsin, ama layout olması daha iyi
+        // Basitlik için burada kodla ekliyorum, eğer layout'un varsa onu inflate et
+
+        // ... (Senin mevcut kodunda burası muhtemelen layout inflate ediyordu)
+        // Eğer elinde item_library_book.xml varsa şu satırı kullan:
         View bookView = LayoutInflater.from(this).inflate(R.layout.item_library_book, binding.layoutBookListContainer, false);
 
         TextView tvTitle = bookView.findViewById(R.id.tvBookTitle);
         TextView tvPages = bookView.findViewById(R.id.tvBookPages);
-        TextView btnFinished = bookView.findViewById(R.id.btnStatusFinished);
-        TextView btnInProgress = bookView.findViewById(R.id.btnStatusInProgress);
-        TextView btnNotStarted = bookView.findViewById(R.id.btnStatusNotStarted);
+        // Status butonları varsa onları da bağla...
 
         tvTitle.setText(title);
         tvPages.setText("Page: " + pages);
 
-        if (status != null) {
-            if (status.equals("Finished")) {
-                btnFinished.setBackgroundColor(Color.parseColor("#4CAF50"));
-                btnFinished.setTextColor(Color.WHITE);
-            } else if (status.equals("In Progress")) {
-                btnInProgress.setBackgroundColor(Color.parseColor("#FFC107"));
-                btnInProgress.setTextColor(Color.BLACK);
-            } else {
-                btnNotStarted.setBackgroundColor(Color.LTGRAY);
-            }
-        }
         binding.layoutBookListContainer.addView(bookView);
     }
 
@@ -198,7 +201,7 @@ public class StudentDetailActivity extends AppCompatActivity {
                 .add(bookMap)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Book Added!", Toast.LENGTH_SHORT).show();
-                    fetchReadingDiary();
+                    fetchReadingDiary(); // Listeyi yenile
                 });
     }
 }

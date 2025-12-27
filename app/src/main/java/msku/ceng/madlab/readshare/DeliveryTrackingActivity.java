@@ -17,8 +17,8 @@ public class DeliveryTrackingActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         // Haritaya tıklayınca uyarı ver (Opsiyonel)
-        findViewById(R.id.cardMap).setOnClickListener(v ->
-                Toast.makeText(this, "Map view is expanding...", Toast.LENGTH_SHORT).show()
-        );
+//        findViewById(R.id.cardMap).setOnClickListener(v ->
+//                Toast.makeText(this, "Map view is expanding...", Toast.LENGTH_SHORT).show()
+//        );
     }
 }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="4dp"
+    android:background="@drawable/input_border_red"
+    android:layout_marginBottom="4dp">
+    <TextView
+        android:id="@+id/tvRowDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="12/05"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:textColor="#333333"/>
+
+    <TextView
+        android:id="@+id/tvRowBook"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:text="Harry Potter"
+        android:textSize="12sp"
+        android:gravity="center|start"
+        android:paddingStart="4dp"
+        android:textColor="#000000"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tvRowPage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:text="45"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:textColor="#333333"/>
+
+    <TextView
+        android:id="@+id/tvRowNote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:text="Very exciting..."
+        android:textSize="11sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:gravity="center|start"
+        android:paddingStart="4dp"
+        android:textColor="#666666"/>
+
+</LinearLayout>

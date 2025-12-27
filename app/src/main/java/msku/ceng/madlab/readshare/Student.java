@@ -1,28 +1,42 @@
 package msku.ceng.madlab.readshare;
-
+import com.google.firebase.firestore.DocumentId;
 public class Student {
     private String name;
     private String school;
     private String city;
     private String age;
-    private String bookNeed; // <-- 5. Değişkenimiz bu!
+    private String bookNeed; // Bu çok önemli!
+    private String studentId;
+    private String documentId;
 
-    // Firebase için boş yapıcı metod (Zorunlu!)
-    public Student() {}
+    public Student() { } // Firebase için şart
 
-    // İŞTE BURASI: Parantez içinde 5 tane String olmalı
     public Student(String name, String school, String city, String age, String bookNeed) {
         this.name = name;
         this.school = school;
         this.city = city;
         this.age = age;
-        this.bookNeed = bookNeed; // İhtiyacı buraya kaydediyoruz
+        this.bookNeed = bookNeed;
     }
 
-    // Getter Metotları
+    // Getter ve Setter'lar
     public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
     public String getSchool() { return school; }
+    public void setSchool(String school) { this.school = school; }
+
     public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
     public String getAge() { return age; }
+    public void setAge(String age) { this.age = age; }
+
     public String getBookNeed() { return bookNeed; }
+    public void setBookNeed(String bookNeed) { this.bookNeed = bookNeed; }
+
+    public String getStudentId() { return studentId; }
+    public void setStudentId(String studentId) { this.studentId = studentId; }
+    public String getDocumentId() { return documentId; }
+    public void setDocumentId(String documentId) { this.documentId = documentId; }
 }

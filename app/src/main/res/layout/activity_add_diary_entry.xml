@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="32dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@android:drawable/ic_menu_revert"
+            android:rotation="180"
+            android:tint="#000000"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add New Entry"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/etDate"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/input_border_red"
+        android:hint="DD/MM/YYYY"
+        android:inputType="date"
+        android:paddingStart="16dp"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name of the Book"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/etBookName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/input_border_red"
+        android:hint="e.g. Harry Potter"
+        android:inputType="textCapWords"
+        android:paddingStart="16dp"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Page Number / Progress"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/etPage"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/input_border_red"
+        android:hint="e.g. 45"
+        android:inputType="number"
+        android:paddingStart="16dp"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Note / Summary"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/etNote"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@drawable/input_border_red"
+        android:hint="Write your thoughts here..."
+        android:gravity="top|start"
+        android:padding="16dp"
+        android:layout_marginBottom="32dp"/>
+
+    <Button
+        android:id="@+id/btnSaveEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save to Diary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:backgroundTint="#FF6B6B"
+        android:textColor="#FFFFFF"
+        android:paddingVertical="14dp"/>
+
+</LinearLayout>

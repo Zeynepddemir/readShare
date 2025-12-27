@@ -37,6 +37,7 @@
         <activity android:name="ReadingDiaryActivity"/>
         <activity android:name=".AddDiaryEntryActivity" />
         <activity android:name=".DonorProfileActivity" />
+        <activity android:name=".DonationHistoryActivity" />
 
 
     </application>

@@ -27,7 +27,7 @@
             android:id="@+id/imgBookIcon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@android:drawable/ic_menu_book"
+            android:src="@drawable/ic_menu_book"
             app:tint="#FF6B6B"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"

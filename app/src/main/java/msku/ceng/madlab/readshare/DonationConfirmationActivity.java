@@ -3,140 +3,112 @@ package msku.ceng.madlab.readshare;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
-import msku.ceng.madlab.readshare.databinding.ActivityDonationConfirmationBinding;
 
 public class DonationConfirmationActivity extends AppCompatActivity {
 
-    private ActivityDonationConfirmationBinding binding;
+    // XML'deki yeni ID'lere göre tanımlamalar
+    private TextView tvBookName, tvAuthor, tvAddress, tvSummaryBook, tvTotal;
+    private Button btnConfirm;
+    private ImageView btnBack;
+
     private FirebaseFirestore db;
-    private String studentId;
-    private String bookName; // Kitap adını global yaptık
+    private String studentId, bookName, schoolName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityDonationConfirmationBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_donation_confirmation);
 
         db = FirebaseFirestore.getInstance();
 
-        // Verileri Al
-        bookName = getIntent().getStringExtra("bookName");
-        String price = getIntent().getStringExtra("price");
-        String locationDisplay = getIntent().getStringExtra("location"); // Bu sadece ekranda göstermek için
+        // 1. GÖRÜNÜMLERİ BAĞLA (Yeni Tasarıma Göre)
+        tvBookName = findViewById(R.id.tvBasketBookName);
+        tvAuthor = findViewById(R.id.tvBasketAuthor); // Genelde boş gelir ama kodda dursun
+        tvAddress = findViewById(R.id.tvConfirmAddress);
+        tvSummaryBook = findViewById(R.id.tvSummaryBookName);
+        tvTotal = findViewById(R.id.tvSummaryTotal);
+        btnConfirm = findViewById(R.id.btnFinalConfirm);
+        btnBack = findViewById(R.id.btnBack);
 
-        studentId = getIntent().getStringExtra("studentId");
-        if (studentId == null) studentId = "demo_student_id";
+        // 2. VERİLERİ AL (Profile sayfasından gelen paket)
+        Intent intent = getIntent();
+        bookName = intent.getStringExtra("bookName");
+        schoolName = intent.getStringExtra("schoolName");
+        studentId = intent.getStringExtra("studentId");
 
-        // Ekrana Yaz
+        // 3. EKRANA YAZDIR
         if (bookName != null) {
-            binding.tvBasketBookName.setText(bookName);
-            binding.tvSummaryBookName.setText(bookName);
+            tvBookName.setText(bookName);
+            tvSummaryBook.setText(bookName);
+        } else {
+            tvBookName.setText("Unknown Book");
         }
-        if (price != null) binding.tvSummaryTotal.setText("Total: " + price);
-        if (locationDisplay != null) binding.tvConfirmAddress.setText(locationDisplay);
 
-        binding.btnBack.setOnClickListener(v -> finish());
+        if (schoolName != null) {
+            tvAddress.setText(schoolName);
+        } else {
+            tvAddress.setText("Unknown Address");
+        }
 
-        // --- BUTONA BASINCA ---
-        binding.btnFinalConfirm.setOnClickListener(v -> {
-            // Butonu kilitle
-            binding.btnFinalConfirm.setEnabled(false);
-            binding.btnFinalConfirm.setText("Verifying School...");
+        // Yazar bilgisi veri tabanında tutulmadığı için varsayılan bırakıyoruz
+        tvAuthor.setText("Classic Book");
 
-            // DİNAMİK HAMLE: Öğrencinin gerçek okulunu veritabanından çek!
-            fetchStudentSchoolAndDonate();
+        // Bağış olduğu için ücret 0
+        tvTotal.setText("Total: Free Donation");
+
+        // 4. GERİ BUTONU
+        btnBack.setOnClickListener(v -> finish());
+
+        // 5. ONAY BUTONU
+        btnConfirm.setOnClickListener(v -> {
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                processDonation(currentUserId, schoolName);
+            } else {
+                Toast.makeText(this, "Please Login First!", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
-    private void fetchStudentSchoolAndDonate() {
-        // Öğrenci belgesine git
-        db.collection("students").document(studentId).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    String realSchoolName = "Unknown School";
-
-                    if (documentSnapshot.exists()) {
-                        // Veritabanındaki 'school' alanını al
-                        String schoolFromDb = documentSnapshot.getString("school");
-                        if (schoolFromDb != null && !schoolFromDb.isEmpty()) {
-                            realSchoolName = schoolFromDb;
-                        }
-                    }
-
-                    // Okul ismini bulduk, şimdi kaydet
-                    saveBookToLibrary(bookName, realSchoolName);
-                })
-                .addOnFailureListener(e -> {
-                    // Hata olursa varsayılan isimle devam et (İşlem yarıda kalmasın)
-                    saveBookToLibrary(bookName, "Unknown School");
-                });
-    }
-
-    private void saveBookToLibrary(String bookTitle, String verifiedSchoolName) {
-        binding.btnFinalConfirm.setText("Processing Donation...");
-
-        Map<String, Object> newBook = new HashMap<>();
-        newBook.put("title", bookTitle);
-        newBook.put("author", "Gifted Donor");
-        newBook.put("pageCount", "300");
-        newBook.put("status", "Not Started");
-        newBook.put("addedDate", Timestamp.now());
-        newBook.put("donorMessage", "Good luck!");
-
-        String myDonorId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        newBook.put("donorId", myDonorId);
-
-        // 1. Öğrenciye Ekle
-        db.collection("students").document(studentId).collection("library")
-                .add(newBook)
-                .addOnSuccessListener(documentReference -> {
-
-                    // 2. Bağışçının İstatistiklerini GÜNCEL OKUL İSMİYLE güncelle
-                    updateDonorStats(myDonorId, verifiedSchoolName);
-                })
-                .addOnFailureListener(e -> {
-                    binding.btnFinalConfirm.setEnabled(true);
-                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void updateDonorStats(String donorId, String schoolName) {
-        // 1. İstatistikleri Güncelle
+    private void processDonation(String donorId, String schoolName) {
+        // A) İstatistikleri Güncelle (Toplam bağış sayısı artar)
         Map<String, Object> updates = new HashMap<>();
         updates.put("totalDonations", FieldValue.increment(1));
         updates.put("helpedSchools", FieldValue.arrayUnion(schoolName));
 
-        db.collection("users").document(donorId)
-                .update(updates);
+        db.collection("users").document(donorId).update(updates);
 
-        // 2. GEÇMİŞ KAYDI OLUŞTUR
+        // B) Geçmişe (History) Ekle
         Map<String, Object> historyRecord = new HashMap<>();
-        historyRecord.put("bookName", getIntent().getStringExtra("bookName"));
+        historyRecord.put("bookName", bookName);
         historyRecord.put("schoolName", schoolName);
+        historyRecord.put("studentId", studentId);
         historyRecord.put("date", com.google.firebase.Timestamp.now());
-
-        // --- MANTIKLI OLAN ---
-        // Kitap yeni bağışlandı, henüz öğrenci teslim almadı ve yazmadı.
-        // O yüzden mesaj BOŞ.
-        historyRecord.put("studentMessage", "");
+        historyRecord.put("studentMessage", ""); // Mesaj şimdilik boş
 
         db.collection("users").document(donorId).collection("history")
                 .add(historyRecord)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Donation Complete! 🎉", Toast.LENGTH_LONG).show();
+                    // C) Başarılı Olunca Yönlendir
+                    Toast.makeText(this, "Donation Confirmed! Thank you! 🚀", Toast.LENGTH_LONG).show();
 
                     Intent intent = new Intent(DonationConfirmationActivity.this, DonorDiscoveryActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }

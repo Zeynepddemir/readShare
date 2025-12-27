@@ -8,6 +8,7 @@
     android:background="#F9F9F9"
     tools:context=".DonationConfirmationActivity">
 
+
     <ImageView
         android:id="@+id/btnBack"
         android:layout_width="30dp"

@@ -58,14 +58,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(this, "Login Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         });
-        Button btnDiary = findViewById(R.id.btnReadingDiary);
 
-        btnDiary.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ReadingDiaryActivity.class);
-            // Öğrenci girişi olmadığı için "Demo" bir ID yolluyoruz ki veritabanına kayıt yapabilsin
-            intent.putExtra("studentId", "demo_student_user");
-            startActivity(intent);
-        });
 
         // Kayıt Ol Linki
         binding.tvSignUpPrompt.setOnClickListener(v -> {

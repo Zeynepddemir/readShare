@@ -2,46 +2,81 @@ package msku.ceng.madlab.readshare;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import msku.ceng.madlab.readshare.databinding.ActivityStudentProfileBinding;
 
 public class StudentProfileActivity extends AppCompatActivity {
-    private ActivityStudentProfileBinding binding;
-    // Bu sayfaya gelen öğrenci ID'si
-    private String currentStudentId;
+
+    // XML'deki ID'lere karşılık gelen değişkenler
+    private TextView tvName, tvSchool, tvClass, tvLocation, tvBookNeed;
+    private ImageView btnBack;
+
+    // Verileri taşıyacağımız değişkenler
+    private String studentId, studentName, bookName, schoolName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityStudentProfileBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_student_profile); // XML ismin
 
-        String name = getIntent().getStringExtra("name");
-        String school = getIntent().getStringExtra("school");
-        String city = getIntent().getStringExtra("city");
+        // 1. GÖRÜNÜMLERİ BAĞLA
+        btnBack = findViewById(R.id.btnBack);
+        tvName = findViewById(R.id.tvProfileName);
+        tvSchool = findViewById(R.id.tvProfileSchool);
+        tvClass = findViewById(R.id.tvProfileClass);
+        tvLocation = findViewById(R.id.tvProfileLocation);
 
-        // Listeden gelen ID'yi alıyoruz (DonorDiscovery'den gelmişti)
-        currentStudentId = getIntent().getStringExtra("studentId");
-        // Eğer ID gelmediyse isimden ID uydur (Fallback)
-        if(currentStudentId == null && name != null) currentStudentId = name;
+        // Burası kritik: Tasarımda buton yok, kitaba tıklayınca bağış başlayacak
+        tvBookNeed = findViewById(R.id.tvBookNeed1);
 
-        if(name != null) binding.tvProfileName.setText("Name: " + name);
-        if(school != null) binding.tvProfileSchool.setText("School: " + school);
-        if(city != null) binding.tvProfileLocation.setText("Location: " + city);
+        // 2. ÖNCEKİ SAYFADAN GELEN VERİLERİ AL
+        Intent intent = getIntent();
+        studentId = intent.getStringExtra("studentId");
+        studentName = intent.getStringExtra("studentName");
+        bookName = intent.getStringExtra("bookName");
+        schoolName = intent.getStringExtra("schoolName");
 
-        // Kitap İhtiyacına Tıkla -> Öneri Ekranına Git
-        binding.tvBookNeed1.setOnClickListener(v -> {
-            Intent intent = new Intent(this, BookSuggestionActivity.class);
-            intent.putExtra("category", "Animal Stories");
-            intent.putExtra("location", (city != null ? city : "Muğla") + " School");
-            intent.putExtra("target", "10 Years Old");
+        // 3. EKRANA YAZDIR (Formatı koruyarak: "Name: ...")
+        if (studentName != null) {
+            tvName.setText("Name: " + studentName);
+        }
 
-            // KRİTİK: ID'yi bir sonraki sayfaya taşıyoruz!
-            intent.putExtra("studentId", currentStudentId);
+        if (schoolName != null) {
+            tvSchool.setText("School: " + schoolName);
+            tvLocation.setText("Location: " + schoolName); // Konum olarak da okulu gösteriyoruz
+        }
 
-            startActivity(intent);
+        if (bookName != null) {
+            // Kitap isminin başındaki "Needs:" yazısını temizleyip sadece kitabı yazalım
+            String cleanBookName = bookName.replace("Needs: ", "");
+            tvBookNeed.setText(cleanBookName);
+            // Güncel kitap ismini değişkende tutalım
+            bookName = cleanBookName;
+        }
+
+        // Sınıf bilgisini statik bırakıyoruz veya varsa intent ile alabilirsin
+        tvClass.setText("Class: 3/B");
+
+        // 4. GERİ BUTONU
+        btnBack.setOnClickListener(v -> finish());
+
+        // 5. BAĞIŞI BAŞLAT (KİTABA TIKLAYINCA)
+        tvBookNeed.setOnClickListener(v -> {
+            if (studentId == null) {
+                Toast.makeText(this, "Error: Student info missing!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Confirmation sayfasına git ve verileri taşı
+            Intent confirmationIntent = new Intent(StudentProfileActivity.this, DonationConfirmationActivity.class);
+            confirmationIntent.putExtra("studentId", studentId);
+            confirmationIntent.putExtra("bookName", bookName);
+            confirmationIntent.putExtra("schoolName", schoolName);
+
+            startActivity(confirmationIntent);
         });
-
-        binding.btnBack.setOnClickListener(v -> finish());
     }
 }

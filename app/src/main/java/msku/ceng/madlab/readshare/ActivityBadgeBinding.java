@@ -4,7 +4,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import msku.ceng.madlab.readshare.databinding.ActivityBadgeCollectionBinding;
 
-public class BadgeActivity extends AppCompatActivity {
+public class ActivityBadgeBinding extends AppCompatActivity {
     private ActivityBadgeCollectionBinding binding;
 
     @Override

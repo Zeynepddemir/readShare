@@ -2,6 +2,7 @@ package msku.ceng.madlab.readshare;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,7 +46,12 @@ public class DonorProfileActivity extends AppCompatActivity {
         // --- BUTON İŞLEMLERİ ---
 
         // 1. Geri Dön
-        btnBack.setOnClickListener(v -> finish());
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> {
+                Log.d("ProfileActivity", "Geriye basıldı - Sayfa kapatılıyor.");
+                finish();
+            });
+        }
 
         // 2. Geçmiş Sayfasına Git
         btnHistory.setOnClickListener(v -> {
@@ -75,19 +81,21 @@ public class DonorProfileActivity extends AppCompatActivity {
                         if (documentSnapshot.exists()) {
                             // A) İSİM
                             String name = documentSnapshot.getString("name");
-                            if (name != null) tvDonorName.setText(name);
+                            tvDonorName.setText(name != null ? name : "Donor");
 
                             // B) TOPLAM BAĞIŞ SAYISI
                             Long donations = documentSnapshot.getLong("totalDonations");
                             if (donations == null) donations = 0L;
                             tvDonationCount.setText(String.valueOf(donations));
 
-                            // C) OKUL SAYISI (Listenin Uzunluğu)
-                            List<String> schools = (List<String>) documentSnapshot.get("helpedSchools");
+                            // C) OKUL SAYISI (GÜVENLİ YÖNTEM 🛡️)
+                            // Listeyi direkt çekmek yerine önce Obje olarak alıp kontrol ediyoruz
+                            Object schoolsObj = documentSnapshot.get("helpedSchools");
                             long schoolCount = 0;
-                            if (schools != null) {
-                                schoolCount = schools.size();
+                            if (schoolsObj instanceof List) {
+                                schoolCount = ((List<?>) schoolsObj).size();
                             }
+
                             if (tvSchoolCount != null) {
                                 tvSchoolCount.setText(String.valueOf(schoolCount));
                             }

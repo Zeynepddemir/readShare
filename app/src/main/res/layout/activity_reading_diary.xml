@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    tools:context=".ReadingDiaryActivity">
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#FF6B6B"
+        android:padding="10dp">
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_revert" />
+        <TextView
+            android:id="@+id/tvTodayDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,193 +30,57 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@android:drawable/ic_menu_revert"
-            app:tint="#000000"
-            android:rotation="180"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:id="@+id/tvPageTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Reading Diary Page"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:fontFamily="@font/salsa"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="24dp"/>
-
-        <LinearLayout
+        <EditText
+            android:id="@+id/etDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="24dp">
+            android:hint="DD/MM/YYYY" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginEnd="24dp">
-
-                <TextView
-                    android:text="CATEGORY"
-                    android:textSize="10sp"
-                    android:textColor="#666666"
-                    android:gravity="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Reading Tracker"
-                    android:background="#FF6B6B"
-                    android:textColor="#FFFFFF"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:text="START DATE"
-                    android:textSize="10sp"
-                    android:textColor="#666666"
-                    android:gravity="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/tvTodayDate"
-                    android:text="mm/dd/yyyy"
-                    android:background="#FF6B6B"
-                    android:textColor="#FFFFFF"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <TableLayout
+        <EditText
+            android:id="@+id/etBookName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:stretchColumns="1,3">
-            <TableRow android:background="#FF6B6B">
-                <TextView
-                    android:text="DATE"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:gravity="center"/>
-                <TextView
-                    android:text="NAME OF THE BOOK"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:gravity="center"/>
-                <TextView
-                    android:text="PAGE"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:gravity="center"/>
-                <TextView
-                    android:text="NOTE"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:gravity="center"/>
-            </TableRow>
-
-            <TableRow>
-                <EditText
-                    android:id="@+id/etDate"
-                    android:background="@drawable/cell_border"
-                    android:minHeight="40dp"
-                    android:inputType="date"
-                    android:hint="Date"/>
-                <EditText
-                    android:id="@+id/etBookName"
-                    android:background="@drawable/cell_border"
-                    android:minHeight="40dp"
-                    android:hint="Book Name"/>
-                <EditText
-                    android:id="@+id/etPage"
-                    android:background="@drawable/cell_border"
-                    android:minHeight="40dp"
-                    android:inputType="number"
-                    android:gravity="center"
-                    android:hint="#"/>
-                <EditText
-                    android:id="@+id/etNote"
-                    android:background="@drawable/cell_border"
-                    android:minHeight="40dp"
-                    android:hint="Note"/>
-            </TableRow>
-
-            <TableRow>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-            </TableRow>
-
-            <TableRow>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-            </TableRow>
-
-            <TableRow>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-            </TableRow>
-
-            <TableRow>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-            </TableRow>
-
-            <TableRow>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-            </TableRow>
-
-            <TableRow>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-                <TextView android:background="@drawable/cell_border" android:height="40dp"/>
-            </TableRow>
-
-        </TableLayout>
+            android:hint="Enter Book Name" />
+        <EditText
+        android:id="@+id/etPage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Page Count"
+        android:inputType="number" />
+        <EditText
+        android:id="@+id/etNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Your notes about the reading..." />
 
         <Button
             android:id="@+id/btnSaveEntry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save Entry"
+            android:text="Save to Diary"
             android:backgroundTint="#FF6B6B"
-            android:layout_marginTop="24dp"/>
-
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="10dp"/>
     </LinearLayout>
-</ScrollView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TableLayout
+            android:id="@+id/tableDiary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"
+            android:padding="10dp">
+
+            <TableRow android:background="#DDDDDD">
+                <TextView android:text="Date" android:textStyle="bold" android:padding="5dp" android:gravity="center"/>
+                <TextView android:text="Book" android:textStyle="bold" android:padding="5dp" android:gravity="center"/>
+                <TextView android:text="Page" android:textStyle="bold" android:padding="5dp" android:gravity="center"/>
+                <TextView android:text="Note" android:textStyle="bold" android:padding="5dp" android:gravity="center"/>
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+
+</LinearLayout>

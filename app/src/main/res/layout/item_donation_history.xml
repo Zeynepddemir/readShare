@@ -3,105 +3,56 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
+    android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="#FFFFFF">
+    app:cardElevation="4dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="16dp">
-
-        <View
-            android:id="@+id/strip"
-            android:layout_width="6dp"
-            android:layout_height="0dp"
-            android:background="#FF6B6B"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
         <ImageView
-            android:id="@+id/imgBookIcon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_menu_book"
+            android:src="@android:drawable/ic_menu_agenda"
             app:tint="#FF6B6B"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toEndOf="@id/strip"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:background="#FFF0F0"
+            android:padding="8dp"/>
 
-        <TextView
-            android:id="@+id/tvHistoryBookName"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Harry Potter"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintStart_toEndOf="@id/imgBookIcon"
-            app:layout_constraintTop_toTopOf="@id/imgBookIcon"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
 
-        <TextView
-            android:id="@+id/tvHistorySchool"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Atatürk Primary School"
-            android:textSize="14sp"
-            android:textColor="#757575"
-            android:layout_marginTop="4dp"
-            app:layout_constraintStart_toStartOf="@id/tvHistoryBookName"
-            app:layout_constraintTop_toBottomOf="@id/tvHistoryBookName"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            <TextView
+                android:id="@+id/tvHistoryBookName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Book Name"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#000000"/>
+
+            <TextView
+                android:id="@+id/tvHistorySchool"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="School Name"
+                android:textSize="14sp"
+                android:textColor="#666666"/>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvHistoryDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12 Oct 2025"
+            android:text="Date"
             android:textSize="12sp"
-            android:textStyle="italic"
-            android:textColor="#9E9E9E"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="@id/tvHistoryBookName"
-            app:layout_constraintTop_toBottomOf="@id/tvHistorySchool"/>
-
-        <LinearLayout
-            android:id="@+id/layoutMessage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#F0F8FF"
-            android:padding="12dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="16dp"
-            android:gravity="center_vertical"
-            app:layout_constraintTop_toBottomOf="@id/tvHistoryDate"
-            app:layout_constraintStart_toStartOf="@id/tvHistoryBookName"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@android:drawable/sym_action_chat"
-                app:tint="#2196F3"
-                android:layout_marginEnd="8dp"/>
-
-            <TextView
-                android:id="@+id/tvStudentMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Thank you so much! I love this book."
-                android:textSize="13sp"
-                android:textColor="#0D47A1"
-                android:textStyle="italic"/>
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:textColor="#999999"/>
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

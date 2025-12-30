@@ -1,126 +1,172 @@
 package msku.ceng.madlab.readshare;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import msku.ceng.madlab.readshare.databinding.ActivityBookSuggestionBinding;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BookSuggestionActivity extends AppCompatActivity {
 
-    private ActivityBookSuggestionBinding binding;
+    private RecyclerView rvSuggestions, rvBasket;
+    private TextView tvTotalPrice;
+    private Button btnConfirm;
 
-    // Şu an seçili olan kitabın bilgileri (Varsayılan değerler)
-    private String selectedBookTitle = "Select a Book";
-    private String selectedBookPrice = "$0";
-    private String studentId; // Bağış yapılacak öğrenci
+    private List<Book> suggestionList = new ArrayList<>();
+    private List<Book> basketList = new ArrayList<>();
+    private SuggestionAdapter suggestionAdapter;
+    private BasketAdapter basketAdapter;
+
+    private FirebaseFirestore db;
+    private String studentId;
+    private String studentName; // Öğrenci adını da taşıyalım
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityBookSuggestionBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_book_suggestion);
 
-        // 1. Gelen Verileri Al
-        String category = getIntent().getStringExtra("category");
-        String location = getIntent().getStringExtra("location");
-        String target = getIntent().getStringExtra("target");
-        // Profil sayfasından studentId gelmeli! Gelmiyorsa demo kullanırız.
+        db = FirebaseFirestore.getInstance();
         studentId = getIntent().getStringExtra("studentId");
-        if(studentId == null) studentId = "demo_student_id";
+        studentName = getIntent().getStringExtra("studentName"); // Intent'ten alıyoruz
 
-        // Başlıkları Doldur
-        if (category != null) binding.tvPageTitle.setText(category + " Donation");
-        if (location != null) binding.tvDeliveryLocation.setText("Location: " + location);
-        if (target != null) binding.tvTargetGroup.setText("Target: " + target);
+        // Görünümleri Bağla
+        rvSuggestions = findViewById(R.id.rvSuggestions);
+        rvBasket = findViewById(R.id.rvBasket);
+        tvTotalPrice = findViewById(R.id.tvTotalPrice);
+        btnConfirm = findViewById(R.id.btnConfirmDonation); // XML ID'si btnConfirmDonation
 
-        binding.btnBack.setOnClickListener(v -> finish());
+        // Listeleri Kur
+        setupLists();
 
-        // 2. Sistem Önerilerini (Kartları) Oluştur
-        createSuggestionCards();
+        // Verileri Çek
+        loadTeacherRequestFromFirebase();
 
-        // 3. Onay Sayfasına Git
-        binding.btnConfirmDonation.setOnClickListener(v -> {
-            if (selectedBookPrice.equals("$0")) {
-                Toast.makeText(this, "Please select a book first!", Toast.LENGTH_SHORT).show();
-                return;
+        // --- ONAY BUTONU DEĞİŞİKLİĞİ ---
+        btnConfirm.setOnClickListener(v -> {
+            if (basketList.isEmpty()) {
+                Toast.makeText(this, "Basket is empty!", Toast.LENGTH_SHORT).show();
+            } else {
+                // Firebase'e yazma! Diğer sayfaya git.
+                goToConfirmationPage();
             }
-
-            Intent intent = new Intent(BookSuggestionActivity.this, DonationConfirmationActivity.class);
-            intent.putExtra("bookName", selectedBookTitle);
-            intent.putExtra("price", selectedBookPrice);
-            intent.putExtra("location", location);
-            intent.putExtra("studentId", studentId); // ÖNEMLİ: Kime gideceğini taşıyoruz
-            startActivity(intent);
         });
     }
 
-    private void createSuggestionCards() {
-        // XML'de ID verdiğimiz kutuyu temizle
-        binding.layoutSuggestionsContainer.removeAllViews();
+    private void setupLists() {
+        rvSuggestions.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        suggestionAdapter = new SuggestionAdapter();
+        rvSuggestions.setAdapter(suggestionAdapter);
 
-        // Örnek Kitaplar (Normalde veritabanından gelebilir)
-        addBookCard("Harry Potter", "$12");
-        addBookCard("Little Prince", "$8");
-        addBookCard("Animal Farm", "$10");
-        addBookCard("Science 101", "$15");
+        rvBasket.setLayoutManager(new LinearLayoutManager(this));
+        basketAdapter = new BasketAdapter();
+        rvBasket.setAdapter(basketAdapter);
     }
 
-    private void addBookCard(String title, String price) {
-        // Dinamik olarak kart (LinearLayout) oluşturuyoruz
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
-        // Arkaplan: Kırmızı çerçeve
-        card.setBackgroundResource(R.drawable.input_border_red);
-        card.setPadding(24, 24, 24, 24);
+    private void goToConfirmationPage() {
+        Book selectedBook = basketList.get(0); // Sepetteki ilk (ve tek) kitabı al
 
-        // Boyutlar (Genişlik 100dp, Yükseklik 130dp gibi)
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(300, 350); // Pixel cinsinden
-        params.setMargins(0, 0, 32, 0); // Sağ tarafa boşluk
-        card.setLayoutParams(params);
-        card.setGravity(Gravity.CENTER);
+        Intent intent = new Intent(BookSuggestionActivity.this, DonationConfirmationActivity.class);
+        intent.putExtra("studentId", studentId);
+        intent.putExtra("bookName", selectedBook.getTitle());
+        // Okul adını şimdilik sabit yolluyoruz veya öğrenci verisinden çekebilirsin
+        intent.putExtra("schoolName", "Atatürk Primary School");
 
-        // Kitap İsmi
-        TextView tvTitle = new TextView(this);
-        tvTitle.setText(title);
-        tvTitle.setTextColor(Color.BLACK);
-        tvTitle.setTextSize(14);
-        tvTitle.setGravity(Gravity.CENTER);
-
-        // Fiyat
-        TextView tvPrice = new TextView(this);
-        tvPrice.setText(price);
-        tvPrice.setTextColor(Color.parseColor("#FF6B6B")); // Kırmızı
-        tvPrice.setTypeface(null, Typeface.BOLD);
-        tvPrice.setGravity(Gravity.CENTER);
-        tvPrice.setPadding(0, 16, 0, 0);
-
-        card.addView(tvTitle);
-        card.addView(tvPrice);
-
-        // TIKLAMA OLAYI: Sepeti Güncelle
-        card.setOnClickListener(v -> {
-            selectedBookTitle = title;
-            selectedBookPrice = price;
-            updateBasketUI();
-
-            Toast.makeText(this, title + " added to basket!", Toast.LENGTH_SHORT).show();
-        });
-
-        // Kartı listeye ekle
-        binding.layoutSuggestionsContainer.addView(card);
+        startActivity(intent);
+        // finish() demiyoruz, kullanıcı geri dönüp değiştirmek isteyebilir.
     }
 
-    private void updateBasketUI() {
-        binding.tvBasketTitle.setText(selectedBookTitle);
-        // Fiyatı güncelle (XML'de ID vermemiş olabiliriz, basket içindeki TextView'i bulmamız lazım)
-        // Eğer basket fiyatına ID vermediysen şimdilik sadece ismi güncelliyoruz.
-        // İstersen XML'e gidip fiyata id verip (tvBasketPrice) buraya binding.tvBasketPrice.setText(...) ekleyebilirsin.
+    private void loadTeacherRequestFromFirebase() {
+        if (studentId == null) return;
+        db.collection("students").document(studentId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String requestedBookName = documentSnapshot.getString("bookNeed");
+                        String author = "Requested Book";
+                        double donationAmount = 0.0; // Bağış ücretsiz görünsün
+
+                        if (requestedBookName != null) {
+                            suggestionList.clear();
+                            // Book sınıfının 3. kurucusu (ID, Title, Author, Price)
+                            suggestionList.add(new Book(studentId, requestedBookName, author, donationAmount));
+                            suggestionAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+    }
+
+    private void addToBasket(Book book) {
+        if (!basketList.isEmpty()) {
+            Toast.makeText(this, "You can donate one book at a time.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        basketList.add(book);
+        basketAdapter.notifyDataSetChanged();
+        updateTotal();
+    }
+
+    private void removeFromBasket(int position) {
+        basketList.remove(position);
+        basketAdapter.notifyDataSetChanged();
+        updateTotal();
+    }
+
+    private void updateTotal() {
+        tvTotalPrice.setText("Total: Free Donation");
+    }
+
+    // --- ADAPTÖRLER ---
+    // (Aynı kalıyor, sadece Book sınıfının birleşmiş halini kullanıyorlar)
+
+    class SuggestionAdapter extends RecyclerView.Adapter<SuggestionAdapter.ViewHolder> {
+        @NonNull @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_book_suggestion, parent, false);
+            return new ViewHolder(v);
+        }
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Book book = suggestionList.get(position);
+            holder.tvTitle.setText(book.getTitle());
+            holder.tvPrice.setText("Free"); // Bağış olduğu için
+            holder.btnAdd.setOnClickListener(v -> addToBasket(book));
+        }
+        @Override
+        public int getItemCount() { return suggestionList.size(); }
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView tvTitle, tvPrice; Button btnAdd;
+            public ViewHolder(View itemView) { super(itemView); tvTitle=itemView.findViewById(R.id.tvBookTitle); tvPrice=itemView.findViewById(R.id.tvBookPrice); btnAdd=itemView.findViewById(R.id.btnAdd); }
+        }
+    }
+
+    class BasketAdapter extends RecyclerView.Adapter<BasketAdapter.ViewHolder> {
+        @NonNull @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cart_book, parent, false);
+            return new ViewHolder(v);
+        }
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Book book = basketList.get(position);
+            holder.tvTitle.setText(book.getTitle());
+            holder.tvPrice.setText("Free");
+            holder.btnRemove.setOnClickListener(v -> removeFromBasket(position));
+        }
+        @Override
+        public int getItemCount() { return basketList.size(); }
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView tvTitle, tvPrice; View btnRemove;
+            public ViewHolder(View itemView) { super(itemView); tvTitle=itemView.findViewById(R.id.tvCartTitle); tvPrice=itemView.findViewById(R.id.tvCartPrice); btnRemove=itemView.findViewById(R.id.btnRemove); }
+        }
     }
 }

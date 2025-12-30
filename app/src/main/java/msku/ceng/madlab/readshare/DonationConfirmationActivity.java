@@ -2,7 +2,6 @@ package msku.ceng.madlab.readshare;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,7 +15,6 @@ import java.util.Map;
 
 public class DonationConfirmationActivity extends AppCompatActivity {
 
-    // XML'deki yeni ID'lere göre tanımlamalar
     private TextView tvBookName, tvAuthor, tvAddress, tvSummaryBook, tvTotal;
     private Button btnConfirm;
     private ImageView btnBack;
@@ -31,45 +29,32 @@ public class DonationConfirmationActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // 1. GÖRÜNÜMLERİ BAĞLA (Yeni Tasarıma Göre)
+        // 1. XML'deki Görünümleri Bağla
         tvBookName = findViewById(R.id.tvBasketBookName);
-        tvAuthor = findViewById(R.id.tvBasketAuthor); // Genelde boş gelir ama kodda dursun
+        tvAuthor = findViewById(R.id.tvBasketAuthor);
         tvAddress = findViewById(R.id.tvConfirmAddress);
         tvSummaryBook = findViewById(R.id.tvSummaryBookName);
         tvTotal = findViewById(R.id.tvSummaryTotal);
         btnConfirm = findViewById(R.id.btnFinalConfirm);
         btnBack = findViewById(R.id.btnBack);
 
-        // 2. VERİLERİ AL (Profile sayfasından gelen paket)
+        // 2. Intent ile Gelen Verileri Al (BookSuggestionActivity'den)
         Intent intent = getIntent();
         bookName = intent.getStringExtra("bookName");
         schoolName = intent.getStringExtra("schoolName");
         studentId = intent.getStringExtra("studentId");
 
-        // 3. EKRANA YAZDIR
-        if (bookName != null) {
-            tvBookName.setText(bookName);
-            tvSummaryBook.setText(bookName);
-        } else {
-            tvBookName.setText("Unknown Book");
-        }
+        // 3. Verileri Ekrana Yaz
+        tvBookName.setText(bookName != null ? bookName : "Unknown Book");
+        tvSummaryBook.setText(bookName != null ? bookName : "Unknown Book");
+        tvAddress.setText(schoolName != null ? schoolName : "Unknown School");
 
-        if (schoolName != null) {
-            tvAddress.setText(schoolName);
-        } else {
-            tvAddress.setText("Unknown Address");
-        }
+        tvAuthor.setText("Requested Item"); // Yazar bilgisi kritik değil
+        tvTotal.setText("Total: Free Donation"); // Bağış olduğu için
 
-        // Yazar bilgisi veri tabanında tutulmadığı için varsayılan bırakıyoruz
-        tvAuthor.setText("Classic Book");
-
-        // Bağış olduğu için ücret 0
-        tvTotal.setText("Total: Free Donation");
-
-        // 4. GERİ BUTONU
+        // 4. Buton Aksiyonları
         btnBack.setOnClickListener(v -> finish());
 
-        // 5. ONAY BUTONU
         btnConfirm.setOnClickListener(v -> {
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                 String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -81,34 +66,43 @@ public class DonationConfirmationActivity extends AppCompatActivity {
     }
 
     private void processDonation(String donorId, String schoolName) {
-        // A) İstatistikleri Güncelle (Toplam bağış sayısı artar)
+        // A) Bağışçının İstatistiklerini Güncelle
         Map<String, Object> updates = new HashMap<>();
         updates.put("totalDonations", FieldValue.increment(1));
-        updates.put("helpedSchools", FieldValue.arrayUnion(schoolName));
+        updates.put("helpedSchools", FieldValue.arrayUnion(schoolName)); // Okul listesine ekle
 
         db.collection("users").document(donorId).update(updates);
 
-        // B) Geçmişe (History) Ekle
-        Map<String, Object> historyRecord = new HashMap<>();
-        historyRecord.put("bookName", bookName);
-        historyRecord.put("schoolName", schoolName);
-        historyRecord.put("studentId", studentId);
-        historyRecord.put("date", com.google.firebase.Timestamp.now());
-        historyRecord.put("studentMessage", ""); // Mesaj şimdilik boş
+        // B) Bağışçının Geçmişine (History) Ekle
+        // DİKKAT: Artık mesaj yok, sadece Kitap, Okul ve Tarih
+        HistoryItem historyItem = new HistoryItem(
+                bookName,
+                schoolName,
+                com.google.firebase.Timestamp.now()
+        );
 
         db.collection("users").document(donorId).collection("history")
-                .add(historyRecord)
-                .addOnSuccessListener(aVoid -> {
-                    // C) Başarılı Olunca Yönlendir
-                    Toast.makeText(this, "Donation Confirmed! Thank you! 🚀", Toast.LENGTH_LONG).show();
+                .add(historyItem);
 
-                    Intent intent = new Intent(DonationConfirmationActivity.this, DonorDiscoveryActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        // C) Öğrenci Durumunu Güncelle (Waiting -> Donated)
+        if (studentId != null) {
+            db.collection("students").document(studentId)
+                    .update("status", "Donated")
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Donation Successful! Thank you ❤️", Toast.LENGTH_LONG).show();
+
+                        // İşlem bitince ana sayfaya (Keşfet) dön
+                        Intent intent = new Intent(DonationConfirmationActivity.this, DonorDiscoveryActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Error updating student: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            // 🔥 EKLENEN TEK KISIM BURASI (GÜVENLİK İÇİN)
+            Toast.makeText(this, "Hata: Öğrenci bilgisi (ID) alınamadı!", Toast.LENGTH_LONG).show();
+        }
     }
 }

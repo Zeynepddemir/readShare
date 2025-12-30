@@ -23,7 +23,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -31,36 +30,23 @@
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 android:textStyle="bold"/>
-
             <TextView
                 android:id="@+id/tvTotalStudents"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Students: 0"
+                android:text="Total Students: Loading..."
                 android:textColor="#FFEBEE"
                 android:textSize="12sp"/>
         </LinearLayout>
-
-        <ImageView
-            android:id="@+id/btnMessages"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@android:drawable/ic_dialog_email"
-            app:tint="#FFFFFF"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"
-            android:layout_marginEnd="16dp"/>
-
         <ImageView
             android:id="@+id/tvLogout"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@android:drawable/ic_lock_power_off"
             app:tint="#FFFFFF"/>
-
     </LinearLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -89,42 +75,28 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="#FFFFFF">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <TextView
-                        android:text="Notifications"
+                        android:text="Shipment Status"
                         android:textStyle="bold"
                         android:textColor="#333333"
                         android:textSize="16sp"
-                        android:layout_marginBottom="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"/>
                     <TextView
-                        android:id="@+id/tvNotifMessage"
-                        android:text="0 Thank-you messages waiting"
+                        android:id="@+id/tvDeliveryStatus"
+                        android:text="Checking deliveries..."
                         android:textSize="14sp"
-                        android:textColor="#FF9800"
+                        android:textColor="#555555"
                         android:textStyle="bold"
                         android:drawablePadding="8dp"
                         android:gravity="center_vertical"
-                        app:drawableStartCompat="@android:drawable/ic_dialog_email"
-                        android:layout_marginBottom="4dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="1 Delivery pending confirmation"
-                        android:textSize="14sp"
-                        android:textColor="#555555"
-                        android:drawablePadding="8dp"
-                        android:gravity="center_vertical"
-                        app:drawableStartCompat="@android:drawable/ic_input_add"
+                        app:drawableStartCompat="@android:drawable/ic_menu_send"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
@@ -133,7 +105,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="My Students"
+                android:text="My Class List"
                 android:textStyle="bold"
                 android:textColor="#333333"
                 android:textSize="18sp"
@@ -141,13 +113,36 @@
                 android:layout_marginBottom="8dp"/>
 
             <LinearLayout
-                android:id="@+id/layoutStudentCardsContainer"
+                android:id="@+id/layoutEmptyState"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingHorizontal="16dp"/>
+                android:gravity="center"
+                android:padding="40dp"
+                android:visibility="gone">
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:tint="#CCCCCC" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No students found"
+                    android:textColor="#999999"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="10dp"/>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvStudents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_student"/>
 
         </LinearLayout>
-    </ScrollView>
-
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

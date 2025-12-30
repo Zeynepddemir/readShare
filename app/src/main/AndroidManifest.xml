@@ -28,14 +28,10 @@
         <activity android:name=".StudentProfileActivity" />
         <activity android:name=".BookSuggestionActivity" />
         <activity android:name=".DonationConfirmationActivity" />
-        <activity android:name=".ThankYouMessageActivity" />
-        <activity android:name=".ApproveMessagesActivity" />
-        <activity android:name=".StudentDetailActivity" />
-        <activity android:name=".BadgeActivity" />
+        <activity android:name=".ActivityBadgeBinding" />
         <activity android:name=".DeliveryTrackingActivity"/>
         <activity android:name=".MyLibraryActivity"/>
         <activity android:name="ReadingDiaryActivity"/>
-        <activity android:name=".AddDiaryEntryActivity" />
         <activity android:name=".DonorProfileActivity" />
         <activity android:name=".DonationHistoryActivity" />
 

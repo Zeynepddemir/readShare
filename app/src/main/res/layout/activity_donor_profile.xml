@@ -10,15 +10,20 @@
 
     <ImageView
         android:id="@+id/btnBack"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@android:drawable/ic_menu_revert"
-        app:tint="#000000"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="12dp"
         android:rotation="180"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:src="@android:drawable/ic_menu_revert"
+        android:elevation="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#000000" />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -31,7 +36,7 @@
         app:layout_constraintStart_toEndOf="@id/btnBack"
         app:layout_constraintTop_toTopOf="@id/btnBack"
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
-        android:layout_marginStart="16dp"/>
+        android:layout_marginStart="8dp"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardProfileInfo"

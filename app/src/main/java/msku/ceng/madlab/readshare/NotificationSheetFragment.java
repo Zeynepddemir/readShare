@@ -45,11 +45,9 @@ public class NotificationSheetFragment extends BottomSheetDialogFragment {
     }
 
     private void loadLatestRequest() {
-        // SADECE FİLTRELEME YAPIYORUZ (Sıralamayı kaldırdık)
         db.collection("students")
                 .whereEqualTo("status", "Waiting")
-                // .orderBy("timestamp", Query.Direction.DESCENDING)  <-- BU SATIRI SİL VEYA YORUM YAP
-                .limit(1) // Sadece 1 tane getir
+                .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     list.clear();
@@ -62,9 +60,6 @@ public class NotificationSheetFragment extends BottomSheetDialogFragment {
                             }
                         }
                         adapter.notifyDataSetChanged();
-                    } else {
-                        // Veri yoksa kullanıcıya bilgi ver
-                        // Toast.makeText(getContext(), "Henüz bekleyen istek yok.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {

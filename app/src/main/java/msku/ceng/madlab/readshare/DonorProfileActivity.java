@@ -17,7 +17,7 @@ public class DonorProfileActivity extends AppCompatActivity {
     private ImageView btnBack;
     private Button btnLogout;
     private TextView tvDonorName, tvDonorLevel, tvDonationCount, tvSchoolCount;
-    private TextView btnHistory; // History Butonu
+    private TextView btnHistory;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -27,44 +27,36 @@ public class DonorProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_donor_profile);
 
-        // Firebase Başlat
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Görünüm Elemanlarını Bağla
         btnBack = findViewById(R.id.btnBack);
         btnLogout = findViewById(R.id.btnLogout);
         tvDonorName = findViewById(R.id.tvDonorName);
         tvDonorLevel = findViewById(R.id.tvDonorLevel);
         tvDonationCount = findViewById(R.id.tvDonationCount);
         tvSchoolCount = findViewById(R.id.tvSchoolCount);
-        btnHistory = findViewById(R.id.btnHistory); // Yeni buton
+        btnHistory = findViewById(R.id.btnHistory);
 
-        // Verileri Çek
         fetchUserData();
 
-        // --- BUTON İŞLEMLERİ ---
 
-        // 1. Geri Dön
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {
-                Log.d("ProfileActivity", "Geriye basıldı - Sayfa kapatılıyor.");
+                Log.d("ProfileActivity", " ");
                 finish();
             });
         }
 
-        // 2. Geçmiş Sayfasına Git
         btnHistory.setOnClickListener(v -> {
             Intent intent = new Intent(DonorProfileActivity.this, DonationHistoryActivity.class);
             startActivity(intent);
         });
 
-        // 3. Çıkış Yap (Log Out)
         btnLogout.setOnClickListener(v -> {
             auth.signOut();
             Toast.makeText(this, "Logged out successfully! 👋", Toast.LENGTH_SHORT).show();
 
-            // Giriş Ekranına Dön
             Intent intent = new Intent(DonorProfileActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -79,17 +71,13 @@ public class DonorProfileActivity extends AppCompatActivity {
             db.collection("users").document(userId).get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
-                            // A) İSİM
                             String name = documentSnapshot.getString("name");
                             tvDonorName.setText(name != null ? name : "Donor");
 
-                            // B) TOPLAM BAĞIŞ SAYISI
                             Long donations = documentSnapshot.getLong("totalDonations");
                             if (donations == null) donations = 0L;
                             tvDonationCount.setText(String.valueOf(donations));
 
-                            // C) OKUL SAYISI (GÜVENLİ YÖNTEM 🛡️)
-                            // Listeyi direkt çekmek yerine önce Obje olarak alıp kontrol ediyoruz
                             Object schoolsObj = documentSnapshot.get("helpedSchools");
                             long schoolCount = 0;
                             if (schoolsObj instanceof List) {
@@ -100,7 +88,6 @@ public class DonorProfileActivity extends AppCompatActivity {
                                 tvSchoolCount.setText(String.valueOf(schoolCount));
                             }
 
-                            // D) LEVEL HESAPLA
                             updateLevel(donations);
                         }
                     })
@@ -111,7 +98,7 @@ public class DonorProfileActivity extends AppCompatActivity {
     }
 
     private void updateLevel(long count) {
-        String level = "Beginner Donor"; // Başlangıç
+        String level = "Beginner Donor";
 
         if (count >= 1 && count < 5) {
             level = "Bronze Donor 🥉";

@@ -7,7 +7,6 @@ public class HistoryItem {
     private String schoolName;
     private Timestamp date;
 
-    // Boş kurucu şart
     public HistoryItem() { }
 
     public HistoryItem(String bookName, String schoolName, Timestamp date) {

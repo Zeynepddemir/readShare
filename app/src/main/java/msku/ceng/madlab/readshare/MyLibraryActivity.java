@@ -19,7 +19,6 @@ public class MyLibraryActivity extends AppCompatActivity {
 
     private ActivityMyLibraryBinding binding;
     private FirebaseFirestore db;
-    // Test için sabit ID, giriş sistemi tamamsa Intent'ten almalısın
     private String currentStudentId = "demo_student_id";
 
     @Override
@@ -30,36 +29,31 @@ public class MyLibraryActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // Eğer bir önceki sayfadan ID geldiyse onu kullan
         if (getIntent().getStringExtra("studentId") != null) {
             currentStudentId = getIntent().getStringExtra("studentId");
         }
 
         binding.btnBack.setOnClickListener(v -> finish());
 
-        // Kütüphaneyi Yükle
         fetchLibraryBooks();
     }
 
     private void fetchLibraryBooks() {
-        binding.layoutBookContainer.removeAllViews(); // Listeyi temizle
+        binding.layoutBookContainer.removeAllViews();
 
-        // "students -> ID -> library" koleksiyonundan çekiyoruz
         db.collection("students").document(currentStudentId).collection("library")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         for (DocumentSnapshot snapshot : queryDocumentSnapshots) {
-                            // Kitap verisini ve ID'sini al
                             Book book = snapshot.toObject(Book.class);
-                            String docId = snapshot.getId(); // Güncelleme için lazım
+                            String docId = snapshot.getId();
 
                             if (book != null) {
                                 addBookCard(book, docId);
                             }
                         }
                     } else {
-                        // Kütüphane boşsa
                         TextView emptyText = new TextView(this);
                         emptyText.setText("No books in your library yet.");
                         emptyText.setPadding(32, 32, 32, 32);
@@ -72,13 +66,11 @@ public class MyLibraryActivity extends AppCompatActivity {
     }
 
     private void addBookCard(Book book, String docId) {
-        // item_library_book.xml tasarımını şişir
         View bookView = LayoutInflater.from(this).inflate(R.layout.item_library_book, binding.layoutBookContainer, false);
 
         TextView tvTitle = bookView.findViewById(R.id.tvBookTitle);
         TextView tvPages = bookView.findViewById(R.id.tvBookPages);
 
-        // Durum Butonları
         TextView btnNotStarted = bookView.findViewById(R.id.btnStatusNotStarted);
         TextView btnInProgress = bookView.findViewById(R.id.btnStatusInProgress);
         TextView btnFinished = bookView.findViewById(R.id.btnStatusFinished);
@@ -86,22 +78,17 @@ public class MyLibraryActivity extends AppCompatActivity {
         tvTitle.setText(book.getTitle());
         tvPages.setText("Pages: " + book.getPageCount());
 
-        // --- MEVCUT DURUMA GÖRE RENKLENDİRME ---
         updateButtonColors(book.getStatus(), btnNotStarted, btnInProgress, btnFinished);
 
-        // --- TIKLAMA OLAYLARI (GÜNCELLEME) ---
 
-        // 1. Not Started
         btnNotStarted.setOnClickListener(v -> {
             updateBookStatus(docId, "Not Started", btnNotStarted, btnInProgress, btnFinished);
         });
 
-        // 2. In Progress
         btnInProgress.setOnClickListener(v -> {
             updateBookStatus(docId, "In Progress", btnNotStarted, btnInProgress, btnFinished);
         });
 
-        // 3. Finished
         btnFinished.setOnClickListener(v -> {
             updateBookStatus(docId, "Finished", btnNotStarted, btnInProgress, btnFinished);
         });
@@ -109,22 +96,18 @@ public class MyLibraryActivity extends AppCompatActivity {
         binding.layoutBookContainer.addView(bookView);
     }
 
-    // Firebase'de durumu güncelleyen fonksiyon
     private void updateBookStatus(String docId, String newStatus, TextView btn1, TextView btn2, TextView btn3) {
         db.collection("students").document(currentStudentId).collection("library")
                 .document(docId)
                 .update("status", newStatus)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Status updated: " + newStatus, Toast.LENGTH_SHORT).show();
-                    // Görünümü hemen güncelle (Tekrar yüklemeye gerek yok)
                     updateButtonColors(newStatus, btn1, btn2, btn3);
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to update", Toast.LENGTH_SHORT).show());
     }
 
-    // Buton renklerini ayarlayan yardımcı fonksiyon
     private void updateButtonColors(String status, TextView btnNotStarted, TextView btnInProgress, TextView btnFinished) {
-        // Önce hepsini gri yap (Pasif)
         int colorPassive = Color.parseColor("#EEEEEE");
         int colorTextPassive = Color.BLACK;
 
@@ -137,8 +120,7 @@ public class MyLibraryActivity extends AppCompatActivity {
         btnFinished.setBackgroundColor(colorPassive);
         btnFinished.setTextColor(colorTextPassive);
 
-        // Seçili olanı Renkli Yap (Aktif)
-        int colorActive = Color.parseColor("#FF6B6B"); // ReadShare Kırmızısı
+        int colorActive = Color.parseColor("#FF6B6B");
         int colorTextActive = Color.WHITE;
 
         if (status == null) return;

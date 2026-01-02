@@ -22,6 +22,8 @@ public class BookSuggestionActivity extends AppCompatActivity {
     private TextView tvTotalPrice;
     private Button btnConfirm;
 
+    private TextView tvDeliveryLocation;
+
     private List<Book> suggestionList = new ArrayList<>();
     private List<Book> basketList = new ArrayList<>();
     private SuggestionAdapter suggestionAdapter;
@@ -29,7 +31,10 @@ public class BookSuggestionActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private String studentId;
-    private String studentName; // Öğrenci adını da taşıyalım
+    private String studentName;
+
+
+    private String schoolName = "Unknown School";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,26 +43,24 @@ public class BookSuggestionActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         studentId = getIntent().getStringExtra("studentId");
-        studentName = getIntent().getStringExtra("studentName"); // Intent'ten alıyoruz
+        studentName = getIntent().getStringExtra("studentName");
 
-        // Görünümleri Bağla
         rvSuggestions = findViewById(R.id.rvSuggestions);
         rvBasket = findViewById(R.id.rvBasket);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
-        btnConfirm = findViewById(R.id.btnConfirmDonation); // XML ID'si btnConfirmDonation
+        btnConfirm = findViewById(R.id.btnConfirmDonation);
 
-        // Listeleri Kur
+
+        tvDeliveryLocation = findViewById(R.id.tvDeliveryLocation);
+
         setupLists();
 
-        // Verileri Çek
         loadTeacherRequestFromFirebase();
 
-        // --- ONAY BUTONU DEĞİŞİKLİĞİ ---
         btnConfirm.setOnClickListener(v -> {
             if (basketList.isEmpty()) {
                 Toast.makeText(this, "Basket is empty!", Toast.LENGTH_SHORT).show();
             } else {
-                // Firebase'e yazma! Diğer sayfaya git.
                 goToConfirmationPage();
             }
         });
@@ -74,34 +77,52 @@ public class BookSuggestionActivity extends AppCompatActivity {
     }
 
     private void goToConfirmationPage() {
-        Book selectedBook = basketList.get(0); // Sepetteki ilk (ve tek) kitabı al
+        Book selectedBook = basketList.get(0);
 
         Intent intent = new Intent(BookSuggestionActivity.this, DonationConfirmationActivity.class);
         intent.putExtra("studentId", studentId);
         intent.putExtra("bookName", selectedBook.getTitle());
-        // Okul adını şimdilik sabit yolluyoruz veya öğrenci verisinden çekebilirsin
-        intent.putExtra("schoolName", "Atatürk Primary School");
+        intent.putExtra("schoolName", schoolName);
 
         startActivity(intent);
-        // finish() demiyoruz, kullanıcı geri dönüp değiştirmek isteyebilir.
     }
 
     private void loadTeacherRequestFromFirebase() {
         if (studentId == null) return;
+
+        if (tvDeliveryLocation != null) {
+            tvDeliveryLocation.setText("Delivery Location: Loading...");
+        }
+
         db.collection("students").document(studentId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String requestedBookName = documentSnapshot.getString("bookNeed");
+
+                        String fetchedSchoolName = documentSnapshot.getString("schoolName");
+
+                        if (fetchedSchoolName != null && !fetchedSchoolName.isEmpty()) {
+                            schoolName = fetchedSchoolName;
+                            if (tvDeliveryLocation != null) {
+                                tvDeliveryLocation.setText("Delivery Location: " + schoolName);
+                            }
+                        }
+
                         String author = "Requested Book";
-                        double donationAmount = 0.0; // Bağış ücretsiz görünsün
+                        double donationAmount = 0.0;
 
                         if (requestedBookName != null) {
                             suggestionList.clear();
-                            // Book sınıfının 3. kurucusu (ID, Title, Author, Price)
                             suggestionList.add(new Book(studentId, requestedBookName, author, donationAmount));
                             suggestionAdapter.notifyDataSetChanged();
                         }
                     }
+                })
+                .addOnFailureListener(e -> {
+                    if (tvDeliveryLocation != null) {
+                        tvDeliveryLocation.setText("Delivery Location: Info Unavailable");
+                    }
+                    Toast.makeText(this, "Error loading data", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -125,9 +146,6 @@ public class BookSuggestionActivity extends AppCompatActivity {
         tvTotalPrice.setText("Total: Free Donation");
     }
 
-    // --- ADAPTÖRLER ---
-    // (Aynı kalıyor, sadece Book sınıfının birleşmiş halini kullanıyorlar)
-
     class SuggestionAdapter extends RecyclerView.Adapter<SuggestionAdapter.ViewHolder> {
         @NonNull @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -138,7 +156,7 @@ public class BookSuggestionActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Book book = suggestionList.get(position);
             holder.tvTitle.setText(book.getTitle());
-            holder.tvPrice.setText("Free"); // Bağış olduğu için
+            holder.tvPrice.setText("Free");
             holder.btnAdd.setOnClickListener(v -> addToBasket(book));
         }
         @Override

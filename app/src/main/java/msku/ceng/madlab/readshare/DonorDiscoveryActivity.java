@@ -36,20 +36,17 @@ public class DonorDiscoveryActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // RecyclerView Kurulumu
         binding.rvStudentList.setLayoutManager(new LinearLayoutManager(this));
         adapter = new StudentAdapter(filteredList, this);
         binding.rvStudentList.setAdapter(adapter);
 
         fetchStudentsFromFirebase();
 
-        // 🔔 --- YENİ EKLENEN KISIM: BİLDİRİM BUTONU --- 🔔
         binding.iconNotification.setOnClickListener(v -> {
             NotificationSheetFragment bottomSheet = new NotificationSheetFragment();
             bottomSheet.show(getSupportFragmentManager(), "donorNotificationTag");
         });
 
-        // Arama Dinleyicisi
         binding.etSearchBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -62,7 +59,6 @@ public class DonorDiscoveryActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // Sekme Tıklamaları
         binding.btnTabPersonal.setOnClickListener(v -> updateTabs("Personal"));
         binding.btnTabClassroom.setOnClickListener(v -> updateTabs("Classroom"));
 
@@ -78,7 +74,6 @@ public class DonorDiscoveryActivity extends AppCompatActivity {
                     for (DocumentSnapshot snapshot : queryDocumentSnapshots) {
                         Student student = snapshot.toObject(Student.class);
                         if (student != null) {
-                            // 🔥 ID ALMAYI UNUTMA!
                             student.setDocumentId(snapshot.getId());
                             allStudentsList.add(student);
                         }
@@ -89,11 +84,10 @@ public class DonorDiscoveryActivity extends AppCompatActivity {
 
     private void filterList() {
         filteredList.clear();
-        Locale locale = Locale.forLanguageTag("tr"); // Türkçe karakter uyumu için
+        Locale locale = Locale.forLanguageTag("tr");
         String searchLower = currentSearchText.toLowerCase(locale);
 
         for (Student student : allStudentsList) {
-            // Null kontrolü yaparak hata almayı engelliyoruz
             String name = (student.getName() != null) ? student.getName().toLowerCase(locale) : "";
             String book = (student.getBookNeed() != null) ? student.getBookNeed().toLowerCase(locale) : "";
 

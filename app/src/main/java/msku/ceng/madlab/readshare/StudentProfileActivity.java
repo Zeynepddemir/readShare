@@ -41,30 +41,25 @@ public class StudentProfileActivity extends AppCompatActivity {
             currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
 
-        // Intent'ten öğrenci ID'sini al
         studentId = getIntent().getStringExtra("studentId");
 
-        // --- GÖRÜNÜMLERİ BAĞLA ---
         tvDetailName = findViewById(R.id.tvDetailName);
         tvDetailSchool = findViewById(R.id.tvDetailSchool);
         tvProgressText = findViewById(R.id.tvProgressText);
         progressBarReading = findViewById(R.id.progressBarReading);
 
-        // Rozetlerin içine dolacağı kutu
         layoutEarnedBadgesContainer = findViewById(R.id.layoutEarnedBadgesContainer);
         layoutBookListContainer = findViewById(R.id.layoutBookListContainer);
 
         btnAddDiary = findViewById(R.id.btnAddDiary);
         btnAddBook = findViewById(R.id.btnAddBook);
-        btnMarkReceived = findViewById(R.id.btnMarkReceived); // XML'de eklemiştik
+        btnMarkReceived = findViewById(R.id.btnMarkReceived);
 
         btnBack = findViewById(R.id.btnBack);
         btnViewAllBadges = findViewById(R.id.btnViewAllBadges);
 
-        // Verileri Yükle
         loadStudentDetails();
 
-        // --- BUTON TIKLAMALARI ---
         btnBack.setOnClickListener(v -> finish());
 
         btnAddDiary.setOnClickListener(v -> {
@@ -73,21 +68,20 @@ public class StudentProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // "See All Collection" yazısına tıklayınca (İstersen boş bir sayfa açabilir veya Toast mesajı verebilirsin)
         btnViewAllBadges.setOnClickListener(v -> {
-            Toast.makeText(this, "Badge Collection Page", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(StudentProfileActivity.this, ActivityBadgeBinding.class);
+            intent.putExtra("studentId", studentId);
+            startActivity(intent);
         });
 
         btnAddBook.setOnClickListener(v -> showRequestDialog());
 
-        // 🔥 TESLİM ALMA VE İYİLİK ROZETİ KAZANMA
         btnMarkReceived.setOnClickListener(v -> {
             db.collection("students").document(studentId)
                     .update("status", "Received")
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(this, "Book Received! Cycle Complete. 🎉", Toast.LENGTH_SHORT).show();
 
-                        // "Kind Heart" Rozetini Ver
                         db.collection("students").document(studentId)
                                 .update("badges", com.google.firebase.firestore.FieldValue.arrayUnion("Kind Heart"));
                     });
@@ -97,109 +91,132 @@ public class StudentProfileActivity extends AppCompatActivity {
     private void loadStudentDetails() {
         if (studentId == null) return;
 
-        // Anlık Dinleyici (SnapshotListener) sayesinde rozet gelince ekran hemen güncellenir
         db.collection("students").document(studentId).addSnapshotListener((doc, e) -> {
             if (e != null) return;
 
             if (doc != null && doc.exists()) {
-                // 1. İsim ve Okul
                 tvDetailName.setText(doc.getString("name"));
                 tvDetailSchool.setText(doc.getString("schoolName"));
 
-                // 2. İlerleme Çubuğu
                 Long completed = doc.getLong("completedBooks");
                 int completedCount = (completed != null) ? completed.intValue() : 0;
                 progressBarReading.setProgress(completedCount);
                 tvProgressText.setText(completedCount + " / 10 Books Read");
 
-                // 3. 🔥 ROZETLERİ ÇEK VE GÖSTER (Sorun buradaydı, çözüldü)
+                calculateStudentLevelInBackground(completedCount);
+
                 List<String> badges = new ArrayList<>();
                 if (doc.get("badges") != null) {
                     badges = (List<String>) doc.get("badges");
                 }
-                updateBadgesUI(badges); // Listeyi UI metoduna gönder
+                updateBadgesUI(badges);
 
-                // 4. Kitap İhtiyacı Listesi
                 loadLists(doc.getString("bookNeed"));
 
-                // 5. Buton Yönetimi (Öğretmen mi Bağışçı mı?)
                 String teacherId = doc.getString("teacherId");
                 String status = doc.getString("status");
                 manageTeacherButtons(teacherId, status);
             }
         });
     }
+//-----------------THREAD -------------------------
+    private void calculateStudentLevelInBackground(int completedBooks) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-    // --- 🔥 ROZETLERİ GÖRSEL OLARAK OLUŞTURAN METOD ---
+                // Basit bir seviye mantığı
+                final String levelName;
+                if (completedBooks < 3) {
+                    levelName = "Starter Reader 🥉";
+                } else if (completedBooks < 7) {
+                    levelName = "Skilled Reader 🥈";
+                } else {
+                    levelName = "Master Bookworm 🥇";
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!isFinishing()) {
+                            Toast.makeText(StudentProfileActivity.this,
+                                    "Level Analysis: " + levelName,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
     private void updateBadgesUI(List<String> badges) {
-        // Önce temizle ki üst üste binmesin
         layoutEarnedBadgesContainer.removeAllViews();
 
         if (badges == null || badges.isEmpty()) {
-            // Hiç rozet yoksa boş geç
             return;
         }
 
         for (String badgeName : badges) {
-            // 1. Ana Kart (Yatay)
             LinearLayout badgeCard = new LinearLayout(this);
             badgeCard.setOrientation(LinearLayout.HORIZONTAL);
             badgeCard.setPadding(16, 16, 16, 16);
-            badgeCard.setBackgroundResource(R.drawable.input_border_red); // Kırmızı çerçeve
+            badgeCard.setBackgroundResource(R.drawable.input_border_red);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(0, 0, 0, 16); // Alt boşluk
+            params.setMargins(0, 0, 0, 16);
             badgeCard.setLayoutParams(params);
             badgeCard.setGravity(android.view.Gravity.CENTER_VERTICAL);
 
-            // 2. İKON SEÇİMİ VE AÇIKLAMA METNİ
             ImageView badgeIcon = new ImageView(this);
-            int iconRes = android.R.drawable.btn_star_big_on; // Varsayılan
+            int iconRes = android.R.drawable.btn_star_big_on;
             String description = "";
 
             switch (badgeName) {
                 case "Book Beginner":
-                    iconRes = android.R.drawable.ic_menu_myplaces; // Kupa benzeri
+                    iconRes = android.R.drawable.ic_menu_myplaces;
                     description = "Congratulations on reading your very first book! Every great reader starts with one page.";
                     break;
                 case "Reading Streak":
-                    iconRes = android.R.drawable.ic_menu_agenda; // Takvim
+                    iconRes = android.R.drawable.ic_menu_agenda;
                     description = "Awarded for consistent reading habits. You have demonstrated strong dedication!";
                     break;
                 case "Diary Keeper":
-                    iconRes = android.R.drawable.ic_menu_edit; // Defter
+                    iconRes = android.R.drawable.ic_menu_edit;
                     description = "You made your first entry! You are turning your reading into memories.";
                     break;
                 case "Kind Heart":
-                    iconRes = android.R.drawable.btn_star_big_on; // Kalp
+                    iconRes = android.R.drawable.btn_star_big_on;
                     description = "You sent your first Thank-You! Sharing joy makes someone's day brighter.";
                     break;
                 case "Goal Achiever":
-                    iconRes = android.R.drawable.ic_menu_compass; // Hedef
+                    iconRes = android.R.drawable.ic_menu_compass;
                     description = "You reached your reading goal! Proof of your focus and determination.";
                     break;
                 case "Super Reader":
-                    iconRes = android.R.drawable.ic_menu_view; // Süper
+                    iconRes = android.R.drawable.ic_menu_view;
                     description = "You've read 10 books! Keep going, Super Reader!";
                     break;
             }
 
             badgeIcon.setImageResource(iconRes);
 
-            // "Kind Heart" ise kırmızı yap
             if (badgeName.equals("Kind Heart")) {
                 badgeIcon.setColorFilter(Color.RED);
             } else {
-                badgeIcon.setColorFilter(null); // Diğerleri orijinal rengi
+                badgeIcon.setColorFilter(null);
             }
 
             badgeIcon.setLayoutParams(new LinearLayout.LayoutParams(120, 120));
 
-            // 3. METİNLER (Başlık ve Açıklama)
             LinearLayout textLayout = new LinearLayout(this);
             textLayout.setOrientation(LinearLayout.VERTICAL);
-            textLayout.setPadding(24, 0, 0, 0); // İkonla yazı arası boşluk
+            textLayout.setPadding(24, 0, 0, 0);
 
             TextView tvTitle = new TextView(this);
             tvTitle.setText(badgeName);
@@ -215,18 +232,15 @@ public class StudentProfileActivity extends AppCompatActivity {
             textLayout.addView(tvTitle);
             textLayout.addView(tvDesc);
 
-            // 4. Parçaları Birleştir
             badgeCard.addView(badgeIcon);
             badgeCard.addView(textLayout);
 
-            // 5. Ana Ekrana Ekle
             layoutEarnedBadgesContainer.addView(badgeCard);
         }
     }
 
     private void manageTeacherButtons(String teacherId, String status) {
         if (currentUserId != null && currentUserId.equals(teacherId)) {
-            // Öğretmense butonları yönet
             if ("Donated".equals(status)) {
                 btnMarkReceived.setVisibility(View.VISIBLE);
                 btnAddBook.setVisibility(View.GONE);
@@ -241,7 +255,6 @@ public class StudentProfileActivity extends AppCompatActivity {
             }
             btnAddDiary.setVisibility(View.VISIBLE);
         } else {
-            // Bağışçı ise butonları gizle
             btnMarkReceived.setVisibility(View.GONE);
             btnAddBook.setVisibility(View.GONE);
             btnAddDiary.setVisibility(View.GONE);
@@ -275,4 +288,4 @@ public class StudentProfileActivity extends AppCompatActivity {
         });
         builder.show();
     }
-}git
+}

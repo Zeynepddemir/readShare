@@ -41,16 +41,13 @@ public class StudentRegisterFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // Spinner Ayarı
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, CITIES);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerCity.setAdapter(adapter);
-        binding.spinnerCity.setSelection(47); // Muğla varsayılan
+        binding.spinnerCity.setSelection(47);
 
-        // Geri Butonu
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
 
-        // Kaydet Butonu
         binding.btnSubmitStudent.setOnClickListener(v -> {
             String name = binding.etStudentName.getText().toString().trim();
             String age = binding.etAgeGrade.getText().toString().trim();
@@ -62,7 +59,6 @@ public class StudentRegisterFragment extends Fragment {
                 return;
             }
 
-            // İlgi Alanları (Chip) toplama
             StringBuilder interests = new StringBuilder();
             for (int i = 0; i < binding.chipGroupInterests.getChildCount(); i++) {
                 Chip chip = (Chip) binding.chipGroupInterests.getChildAt(i);
@@ -77,7 +73,6 @@ public class StudentRegisterFragment extends Fragment {
             }
             String finalInterests = interestsStr.isEmpty() ? "General Stories" : interestsStr;
 
-            // Seviye (RadioButton) bulma
             String level = "Medium";
             int selectedLevelId = binding.rgReadingLevel.getCheckedRadioButtonId();
             if (selectedLevelId != -1) {
@@ -85,7 +80,6 @@ public class StudentRegisterFragment extends Fragment {
                 level = rb.getText().toString();
             }
 
-            // Öğretmen ID'si ve Veri Hazırlama
             if (auth.getCurrentUser() == null) return;
             String teacherId = auth.getCurrentUser().getUid();
             String bookNeedSummary = finalInterests + " (" + level + " Level)";
@@ -101,17 +95,14 @@ public class StudentRegisterFragment extends Fragment {
             studentMap.put("status", "Waiting");
             studentMap.put("timestamp", com.google.firebase.Timestamp.now());
 
-            // Firebase'e Ekleme
             db.collection("students").add(studentMap)
                     .addOnSuccessListener(documentReference -> {
                         Toast.makeText(getContext(), "Student Saved!", Toast.LENGTH_SHORT).show();
 
-                        // Dashboard listesini anlık yenileme
                         if (getActivity() instanceof TeacherDashboardActivity) {
                             ((TeacherDashboardActivity) getActivity()).loadMyStudents();
                         }
 
-                        // Kayıt sonrası Fragment'ı kapat
                         getParentFragmentManager().popBackStack();
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -123,6 +114,6 @@ public class StudentRegisterFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null; // Bellek sızıntısını önlemek için Binding'i temizle
+        binding = null;
     }
 }

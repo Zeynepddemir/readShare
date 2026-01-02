@@ -3,17 +3,15 @@ package msku.ceng.madlab.readshare;
 import java.io.Serializable;
 
 public class Book implements Serializable {
-    private String id;          // Firebase ID
-    private String title;       // Kitap Adı
-    private String author;      // Yazar
-    private String pageCount;   // Kütüphane için sayfa sayısı
-    private String status;      // Kütüphane için durum (Started, Finished)
-    private double price;       // Bağış için fiyat
+    private String id;
+    private String title;
+    private String author;
+    private String pageCount;
+    private String status;
+    private double price;
 
-    // 1. Boş Yapıcı (Firebase İçin Şart)
     public Book() {}
 
-    // 2. KÜTÜPHANE İÇİN KURUCU (Library)
     public Book(String title, String author, String pageCount, String status) {
         this.title = title;
         this.author = author;
@@ -22,7 +20,6 @@ public class Book implements Serializable {
         this.price = 0.0;
     }
 
-    // 3. BAĞIŞ İÇİN KURUCU (Donation)
     public Book(String id, String title, String author, double price) {
         this.id = id;
         this.title = title;
@@ -32,7 +29,6 @@ public class Book implements Serializable {
         this.pageCount = "0";
     }
 
-    // --- Getter ve Setter Metodları ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

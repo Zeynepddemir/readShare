@@ -40,7 +40,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // Giriş kontrolü
         if (auth.getCurrentUser() == null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
@@ -48,31 +47,26 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         }
         currentTeacherId = auth.getCurrentUser().getUid();
 
-        // 1. Görünümleri Bağla
         tvTotalStudents = findViewById(R.id.tvTotalStudents);
         tvDeliveryStatus = findViewById(R.id.tvDeliveryStatus);
         btnLogout = findViewById(R.id.tvLogout); // XML'de ID'si tvLogout olan ImageView
         btnRegisterNew = findViewById(R.id.btnRegisterNew);
         layoutEmptyState = findViewById(R.id.layoutEmptyState);
 
-        // RecyclerView Ayarları
         rvStudents = findViewById(R.id.rvStudents);
         rvStudents.setLayoutManager(new LinearLayoutManager(this));
         studentList = new ArrayList<>();
         adapter = new StudentAdapter(studentList, this);
         rvStudents.setAdapter(adapter);
 
-        // 2. Buton Olayları
         btnLogout.setOnClickListener(v -> {
             auth.signOut();
             Intent intent = new Intent(TeacherDashboardActivity.this, MainActivity.class);
-            // Geri tuşuna basınca tekrar panele dönmesin diye flag ekliyoruz
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
         });
 
-        // Yeni Öğrenci Ekleme (Fragment Açılır)
         btnRegisterNew.setOnClickListener(v -> {
             StudentRegisterFragment fragment = new StudentRegisterFragment();
             getSupportFragmentManager().beginTransaction()
@@ -81,12 +75,10 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                     .commit();
         });
 
-        // Verileri Yükle
         loadMyStudents();
         checkIncomingDeliveries();
     }
 
-    // Fragment kapandığında veya sayfaya geri dönüldüğünde listeyi yenile
     @Override
     protected void onResume() {
         super.onResume();
@@ -94,7 +86,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         checkIncomingDeliveries();
     }
 
-    // 📦 1. Kargo Durumu Kontrolü (Gelen Kitap Var mı?)
     private void checkIncomingDeliveries() {
         db.collection("students")
                 .whereEqualTo("teacherId", currentTeacherId)
@@ -112,7 +103,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                 });
     }
 
-    // 👨‍🎓 2. Öğrenci Listesini Getir
     public void loadMyStudents() {
         db.collection("students")
                 .whereEqualTo("teacherId", currentTeacherId)
@@ -126,14 +116,12 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                         rvStudents.setVisibility(View.GONE);
                         tvTotalStudents.setText("Total Students: 0");
                     } else {
-                        // Liste doluysa RecyclerView'ı aç
                         layoutEmptyState.setVisibility(View.GONE);
                         rvStudents.setVisibility(View.VISIBLE);
 
                         for (DocumentSnapshot doc : queryDocumentSnapshots) {
                             Student student = doc.toObject(Student.class);
                             if (student != null) {
-                                // 🔥 KRİTİK DÜZELTME: ID'yi snapshot'tan alıp nesneye koyuyoruz!
                                 student.setDocumentId(doc.getId());
 
                                 studentList.add(student);

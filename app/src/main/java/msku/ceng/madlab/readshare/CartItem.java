@@ -6,7 +6,7 @@ public class CartItem {
 
     public CartItem(Book book) {
         this.book = book;
-        this.quantity = 1; // İlk eklendiğinde adet 1 olsun
+        this.quantity = 1;
     }
 
     public Book getBook() { return book; }

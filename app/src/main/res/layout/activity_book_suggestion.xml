@@ -27,9 +27,10 @@
         app:layout_constraintTop_toBottomOf="@id/tvHeader">
 
         <TextView
+            android:id="@+id/tvDeliveryLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Delivery Location: Muğla Middle School"
+            android:text="Delivery Location: Loading..."
             android:textStyle="bold"/>
 
         <TextView

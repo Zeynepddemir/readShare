@@ -54,7 +54,6 @@ public class DonationHistoryActivity extends AppCompatActivity {
 
         String userId = auth.getCurrentUser().getUid();
 
-        // Verileri Tarihe Göre Tersten Çek (En yeni en üstte)
         db.collection("users").document(userId).collection("history")
                 .orderBy("date", Query.Direction.DESCENDING)
                 .get()
@@ -65,12 +64,11 @@ public class DonationHistoryActivity extends AppCompatActivity {
                             HistoryItem item = doc.toObject(HistoryItem.class);
                             historyList.add(item);
                         }
-                        adapter.notifyDataSetChanged(); // Listeyi güncelle
+                        adapter.notifyDataSetChanged();
 
                         rvHistory.setVisibility(View.VISIBLE);
                         tvEmptyState.setVisibility(View.GONE);
                     } else {
-                        // Veri yoksa boş mesajını göster
                         rvHistory.setVisibility(View.GONE);
                         tvEmptyState.setVisibility(View.VISIBLE);
                     }

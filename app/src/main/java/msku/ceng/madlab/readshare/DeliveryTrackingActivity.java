@@ -39,7 +39,6 @@ public class DeliveryTrackingActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(v -> finish());
 
-        // RecyclerView Kurulumu
         rvHistory.setLayoutManager(new LinearLayoutManager(this));
         adapter = new HistoryAdapter(historyList);
         rvHistory.setAdapter(adapter);
@@ -51,7 +50,6 @@ public class DeliveryTrackingActivity extends AppCompatActivity {
         if (FirebaseAuth.getInstance().getCurrentUser() == null) return;
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Kullanıcının "history" koleksiyonunu tarihe göre sıralayıp çekiyoruz
         db.collection("users").document(userId).collection("history")
                 .orderBy("date", Query.Direction.DESCENDING)
                 .get()
@@ -70,7 +68,6 @@ public class DeliveryTrackingActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    // --- Basit İç Adapter Sınıfı ---
     private class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
         private List<HistoryItem> list;
 
@@ -89,7 +86,6 @@ public class DeliveryTrackingActivity extends AppCompatActivity {
             holder.tvBook.setText(item.getBookName());
             holder.tvSchool.setText(item.getSchoolName());
 
-            // Tarih Formatlama
             if (item.getDate() != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
                 holder.tvDate.setText(sdf.format(item.getDate().toDate()));

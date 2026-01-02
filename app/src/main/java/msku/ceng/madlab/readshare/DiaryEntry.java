@@ -6,7 +6,6 @@ public class DiaryEntry {
     private String pages;
     private String note;
 
-    // Firebase için boş kurucu metod şart
     public DiaryEntry() { }
 
     public DiaryEntry(String date, String title, String pages, String note) {

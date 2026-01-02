@@ -21,7 +21,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // XML tasarımını bağla (item_donation_history.xml olmalı dosya adın)
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_donation_history, parent, false);
         return new ViewHolder(view);
     }
@@ -30,11 +29,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         HistoryItem item = historyList.get(position);
 
-        // Bilgileri Yaz
         holder.tvBookName.setText(item.getBookName());
         holder.tvSchool.setText(item.getSchoolName());
 
-        // Tarihi Formatla (Örn: 27 Dec 2025)
         if (item.getDate() != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
             holder.tvDate.setText(sdf.format(item.getDate().toDate()));
@@ -53,7 +50,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            // item_donation_history.xml içindeki ID'lerinle eşleşmeli
             tvBookName = itemView.findViewById(R.id.tvHistoryBookName);
             tvSchool = itemView.findViewById(R.id.tvHistorySchool);
             tvDate = itemView.findViewById(R.id.tvHistoryDate);

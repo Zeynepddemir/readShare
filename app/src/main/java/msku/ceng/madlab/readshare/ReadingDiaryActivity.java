@@ -39,7 +39,6 @@ public class ReadingDiaryActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // Öğrenci ID Kontrolü
         studentId = getIntent().getStringExtra("studentId");
         if (studentId == null) {
             Toast.makeText(this, "Student ID not found!", Toast.LENGTH_SHORT).show();
@@ -47,7 +46,6 @@ public class ReadingDiaryActivity extends AppCompatActivity {
             return;
         }
 
-        // Görünümleri Bağla
         etDate = findViewById(R.id.etDate);
         etBookName = findViewById(R.id.etBookName);
         etPage = findViewById(R.id.etPage);
@@ -57,7 +55,6 @@ public class ReadingDiaryActivity extends AppCompatActivity {
         tvTodayDate = findViewById(R.id.tvTodayDate);
         tableDiary = findViewById(R.id.tableDiary);
 
-        // Tarih Ayarı
         String today = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
         if (tvTodayDate != null) tvTodayDate.setText(today);
         if (etDate != null) etDate.setText(today);
@@ -79,7 +76,6 @@ public class ReadingDiaryActivity extends AppCompatActivity {
             return;
         }
 
-        // 1. Günlük Verisi Hazırla
         Map<String, Object> entry = new HashMap<>();
         entry.put("date", date);
         entry.put("bookName", book);
@@ -87,16 +83,13 @@ public class ReadingDiaryActivity extends AppCompatActivity {
         entry.put("note", note);
         entry.put("timestamp", Timestamp.now());
 
-        // 2. Günlüğe Ekle
         db.collection("students").document(studentId).collection("diary")
                 .add(entry)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Diary Entry Saved! 📝", Toast.LENGTH_SHORT).show();
 
-                    // 3. İstatistikleri Güncelle ve Rozet Kontrolü Yap
                     updateStatsAndCheckBadges();
 
-                    // Formu Temizle
                     etBookName.setText("");
                     etPage.setText("");
                     etNote.setText("");
@@ -105,42 +98,33 @@ public class ReadingDiaryActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    // ReadingDiaryActivity.java içinde bu metodu güncelle:
 
     private void updateStatsAndCheckBadges() {
-        // 1. Kitap sayısını artır
         db.collection("students").document(studentId)
                 .update("completedBooks", FieldValue.increment(1));
 
-        // 2. Rozet Kontrolü
         db.collection("students").document(studentId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         Long currentCountLong = documentSnapshot.getLong("completedBooks");
                         int currentCount = (currentCountLong != null) ? currentCountLong.intValue() : 0;
 
-                        // Yeni toplam sayı
                         int newTotal = currentCount + 1;
 
-                        // --- GÖRSELE GÖRE YENİ ROZET KURALLARI ---
 
-                        // 1. Kitap: Hem "Başlangıç" hem "Günlük Tutucu" rozeti
                         if (newTotal == 1) {
                             awardBadge("Book Beginner");
                             awardBadge("Diary Keeper");
                         }
 
-                        // 3. Kitap: İstikrar Rozeti (Reading Streak)
                         if (newTotal == 3) {
                             awardBadge("Reading Streak");
                         }
 
-                        // 5. Kitap: Hedef Rozeti (Goal Achiever)
                         if (newTotal == 5) {
                             awardBadge("Goal Achiever");
                         }
 
-                        // 10. Kitap: Süper Okuyucu (Super Reader)
                         if (newTotal == 10) {
                             awardBadge("Super Reader");
                         }
@@ -149,7 +133,6 @@ public class ReadingDiaryActivity extends AppCompatActivity {
     }
 
     private void awardBadge(String badgeName) {
-        // Rozeti listeye ekle (arrayUnion: aynısından varsa tekrar eklemez)
         db.collection("students").document(studentId)
                 .update("badges", FieldValue.arrayUnion(badgeName))
                 .addOnSuccessListener(aVoid -> {
@@ -197,8 +180,6 @@ public class ReadingDiaryActivity extends AppCompatActivity {
         tv.setGravity(Gravity.CENTER);
         tv.setPadding(8, 8, 8, 8);
         tv.setTextColor(Color.BLACK);
-        // Arka plan çizgisi (varsa)
-        // tv.setBackgroundResource(R.drawable.cell_border);
         return tv;
     }
 }

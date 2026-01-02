@@ -31,14 +31,12 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Logo Renklendirme
         TextView tvLogo = binding.tvLogo;
         SpannableString spannableString = new SpannableString("readShare");
         spannableString.setSpan(new ForegroundColorSpan(Color.WHITE), 0, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.readshare_primary)), 4, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         tvLogo.setText(spannableString);
 
-        // --- GİRİŞ BUTONU (Login) ---
         binding.btnLogin.setOnClickListener(v -> {
             String email = binding.etEmail.getText().toString().trim();
             String password = binding.etPassword.getText().toString().trim();
@@ -48,10 +46,8 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // 1. Firebase ile Giriş Yap
             auth.signInWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        // Şifre doğru, şimdi bu adam KİM? (Rolünü öğrenelim)
                         checkUserRole(authResult.getUser().getUid());
                     })
                     .addOnFailureListener(e -> {
@@ -60,14 +56,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // Kayıt Ol Linki
         binding.tvSignUpPrompt.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
     }
 
-    // Rol Kontrolü Yapan Fonksiyon
     private void checkUserRole(String userId) {
         db.collection("users").document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -76,12 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
                         if (role != null) {
                             if (role.equals("Teacher")) {
-                                // Öğretmense Dashboard'a
                                 Intent intent = new Intent(MainActivity.this, TeacherDashboardActivity.class);
                                 startActivity(intent);
                                 finish();
                             } else if (role.equals("Donor")) {
-                                // Bağışçıysa Keşif Ekranına
                                 Intent intent = new Intent(MainActivity.this, DonorDiscoveryActivity.class);
                                 startActivity(intent);
                                 finish();

@@ -18,12 +18,11 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
 
     private List<Student> studentList;
     private Context context;
-    private String currentUserId; // Aktif kullanıcı ID'si
+    private String currentUserId;
 
     public StudentAdapter(List<Student> studentList, Context context) {
         this.studentList = studentList;
         this.context = context;
-        // Giriş yapan kullanıcının ID'sini al
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
@@ -40,16 +39,12 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
     public void onBindViewHolder(@NonNull StudentViewHolder holder, int position) {
         Student student = studentList.get(position);
 
-        // Verileri Tasarıma Bağla
         holder.tvBookName.setText(student.getBookNeed() != null ? student.getBookNeed() : "No book requested");
         holder.tvLocation.setText("Location: " + (student.getCity() != null ? student.getCity() : "Unknown"));
 
-        // --- ROL KONTROLÜ (GİZLEME MANTIĞI) ---
-        // Eğer bakan kişi bu öğrencinin öğretmeni ise "Donate" butonunu gizle
         if (currentUserId != null && currentUserId.equals(student.getTeacherId())) {
             holder.btnDonateBook.setVisibility(View.GONE);
         } else {
-            // Değilse (Bağışçıysa) göster
             holder.btnDonateBook.setVisibility(View.VISIBLE);
         }
 
@@ -61,24 +56,17 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentV
             context.startActivity(intent);
         });
 
-        // 2. BUTON: Bağış Sayfasına Git
-
-
-        // StudentAdapter.java içinde...
 
         holder.btnDonateBook.setOnClickListener(v -> {
-            // KONTROL: ID Dolu mu?
             if (student.getDocumentId() != null && !student.getDocumentId().isEmpty()) {
                 Intent intent = new Intent(context, BookSuggestionActivity.class);
                 intent.putExtra("studentId", student.getDocumentId());
                 intent.putExtra("studentName", student.getName());
                 context.startActivity(intent);
             } else {
-                // ID BOŞSA ÇÖKME, UYARI VER
-                android.widget.Toast.makeText(context, "Hata: Öğrenci ID'si alınamadı!", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(context, " ", android.widget.Toast.LENGTH_SHORT).show();
 
-                // Logcat'e yazdıralım ki görelim
-                android.util.Log.e("StudentAdapter", "ID NULL GELDİ! Öğrenci: " + student.getName());
+                android.util.Log.e("StudentAdapter", " " + student.getName());
             }
         });
     }

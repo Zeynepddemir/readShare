@@ -7,7 +7,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import java.util.ArrayList; // Listeler için bunu eklemeyi unutma
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import msku.ceng.madlab.readshare.databinding.ActivityRegisterBinding;
@@ -58,12 +58,10 @@ public class RegisterActivity extends AppCompatActivity {
                         userMap.put("email", email);
                         userMap.put("role", finalRole);
 
-                        // --- YENİ EKLENEN KISIM (BAĞIŞÇI BAŞLANGIÇ AYARLARI) ---
                         if (finalRole.equals("Donor")) {
-                            userMap.put("totalDonations", 0); // Başlangıçta 0 bağış
-                            userMap.put("helpedSchools", new ArrayList<String>()); // Boş liste
+                            userMap.put("totalDonations", 0);
+                            userMap.put("helpedSchools", new ArrayList<String>());
                         }
-                        // -------------------------------------------------------
 
                         db.collection("users").document(userId)
                                 .set(userMap)

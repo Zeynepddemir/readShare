@@ -1,6 +1,8 @@
 package msku.ceng.madlab.readshare;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +13,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DeliveryTrackingActivity extends AppCompatActivity {
 
@@ -27,6 +33,9 @@ public class DeliveryTrackingActivity extends AppCompatActivity {
     private HistoryAdapter adapter;
     private List<HistoryItem> historyList = new ArrayList<>();
     private FirebaseFirestore db;
+
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,18 +63,36 @@ public class DeliveryTrackingActivity extends AppCompatActivity {
                 .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    historyList.clear();
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                            HistoryItem item = doc.toObject(HistoryItem.class);
-                            historyList.add(item);
+
+                    executorService.execute(() -> {
+                        List<HistoryItem> tempList = new ArrayList<>();
+
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                                HistoryItem item = doc.toObject(HistoryItem.class);
+                                tempList.add(item);
+                            }
                         }
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(this, "No donations found yet.", Toast.LENGTH_SHORT).show();
-                    }
+
+                        mainHandler.post(() -> {
+                            historyList.clear();
+                            historyList.addAll(tempList);
+                            if (historyList.isEmpty()) {
+                                Toast.makeText(DeliveryTrackingActivity.this, "Henüz bağış geçmişi bulunmuyor.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+                    });
+
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Toast.makeText(this, "Hata: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executorService.shutdown();
     }
 
     private class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {

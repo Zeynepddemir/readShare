@@ -24,8 +24,6 @@ public class DonorDiscoveryActivity extends AppCompatActivity {
     private List<Student> allStudentsList = new ArrayList<>();
     private List<Student> filteredList = new ArrayList<>();
     private StudentAdapter adapter;
-
-    private String currentTab = "Personal";
     private String currentSearchText = "";
 
     @Override
@@ -59,9 +57,6 @@ public class DonorDiscoveryActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        binding.btnTabPersonal.setOnClickListener(v -> updateTabs("Personal"));
-        binding.btnTabClassroom.setOnClickListener(v -> updateTabs("Classroom"));
-
         setupBottomNav();
     }
 
@@ -91,12 +86,9 @@ public class DonorDiscoveryActivity extends AppCompatActivity {
             String name = (student.getName() != null) ? student.getName().toLowerCase(locale) : "";
             String book = (student.getBookNeed() != null) ? student.getBookNeed().toLowerCase(locale) : "";
 
-            boolean isClassroom = name.contains("sınıf") || name.contains("class");
-            boolean matchesTab = (currentTab.equals("Personal") && !isClassroom) ||
-                    (currentTab.equals("Classroom") && isClassroom);
             boolean matchesSearch = searchLower.isEmpty() || name.contains(searchLower) || book.contains(searchLower);
 
-            if (matchesTab && matchesSearch) {
+            if (matchesSearch) {
                 filteredList.add(student);
             }
         }
@@ -109,22 +101,6 @@ public class DonorDiscoveryActivity extends AppCompatActivity {
             binding.rvStudentList.setVisibility(View.VISIBLE);
         }
         adapter.notifyDataSetChanged();
-    }
-
-    private void updateTabs(String selectedTab) {
-        currentTab = selectedTab;
-        if (selectedTab.equals("Personal")) {
-            binding.btnTabPersonal.setBackgroundResource(R.drawable.rounded_button_red);
-            binding.btnTabPersonal.setTextColor(Color.WHITE);
-            binding.btnTabClassroom.setBackgroundResource(R.drawable.input_border_red);
-            binding.btnTabClassroom.setTextColor(Color.parseColor("#FF6B6B"));
-        } else {
-            binding.btnTabClassroom.setBackgroundResource(R.drawable.rounded_button_red);
-            binding.btnTabClassroom.setTextColor(Color.WHITE);
-            binding.btnTabPersonal.setBackgroundResource(R.drawable.input_border_red);
-            binding.btnTabPersonal.setTextColor(Color.parseColor("#FF6B6B"));
-        }
-        filterList();
     }
 
     private void setupBottomNav() {
